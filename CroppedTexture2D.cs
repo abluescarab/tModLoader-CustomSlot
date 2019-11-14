@@ -22,5 +22,18 @@ namespace CustomSlot {
         public static bool operator !=(CroppedTexture2D ct1, CroppedTexture2D ct2) {
             return ct1.Texture != ct2.Texture || ct1.Rectangle != ct2.Rectangle;
         }
+
+        public override bool Equals(object obj) {
+            return obj is CroppedTexture2D d &&
+                   EqualityComparer<Texture2D>.Default.Equals(Texture, d.Texture) &&
+                   Rectangle.Equals(d.Rectangle);
+        }
+
+        public override int GetHashCode() {
+            var hashCode = -893046046;
+            hashCode = hashCode * -1521134295 + EqualityComparer<Texture2D>.Default.GetHashCode(Texture);
+            hashCode = hashCode * -1521134295 + EqualityComparer<Rectangle>.Default.GetHashCode(Rectangle);
+            return hashCode;
+        }
     }
 }
