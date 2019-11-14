@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace CustomSlotter {
+namespace CustomSlot {
     public struct CroppedTexture2D {
         public Texture2D Texture { get; }
         public Rectangle Rectangle { get; set; }

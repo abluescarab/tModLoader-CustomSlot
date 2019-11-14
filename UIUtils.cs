@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.UI;
 
-namespace CustomSlotter {
+namespace CustomSlot {
     internal class UIUtils {
         /// <summary>
         /// Get the background texture of a slot based on its context.

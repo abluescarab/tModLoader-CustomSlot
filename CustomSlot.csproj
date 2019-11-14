@@ -34,7 +34,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="CustomSlot.cs" />
-    <Compile Include="CustomSlotter.cs" />
     <Compile Include="CroppedTexture2D.cs" />
     <Compile Include="UIUtils.cs" />
   </ItemGroup>

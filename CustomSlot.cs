@@ -12,8 +12,8 @@ using Terraria.UI;
  * TODO: partner slot
  */
 
-namespace CustomSlotter {
     public class CustomSlot : UIElement {
+namespace CustomSlot {
         public enum ArmorType {
             HeadArmor,
             ChestArmor,
