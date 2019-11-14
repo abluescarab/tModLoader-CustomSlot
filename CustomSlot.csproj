@@ -35,6 +35,7 @@
   <ItemGroup>
     <Compile Include="CustomSlot.cs" />
     <Compile Include="CroppedTexture2D.cs" />
+    <Compile Include="ICustomSlot.cs" />
     <Compile Include="UIUtils.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.GameInput;
+using Terraria.ModLoader;
 using Terraria.UI;
 
 /*
@@ -12,94 +13,139 @@ using Terraria.UI;
  * TODO: partner slot
  */
 
-    public class CustomSlot : UIElement {
 namespace CustomSlot {
+    public class CustomSlot : UIElement, ICustomSlot {
         public enum ArmorType {
             HeadArmor,
             ChestArmor,
             LegArmor
         }
 
-        private readonly SlotInterior _interior;
-        private ToggleButton _toggleButton;
-        private bool _forceToggleButton;
+        internal const int TickOffsetX = 3;
+        internal const int TickOffsetY = 2;
+
+        private readonly SlotInterior interior;
+        private ToggleVisibilityButton toggleButton;
+        private bool forceToggleButton;
 
         public bool ItemVisible { get; set; }
 
-        public CroppedTexture2D BackgroundTexture => _interior.BackgroundTexture;
-        public CroppedTexture2D EmptyTexture => _interior.EmptyTexture;
-        public int Context => _interior.Context;
+        public int Context => interior.Context;
+
+        public CroppedTexture2D BackgroundTexture {
+            get => interior.BackgroundTexture;
+            set {
+                interior.BackgroundTexture = value;
+                CalculateSize(this, TickOffsetX, TickOffsetY);
+            }
+        }
+
+        public CroppedTexture2D EmptyTexture {
+            get => interior.EmptyTexture;
+            set => interior.EmptyTexture = value;
+        }
 
         public Item Item {
-            get => _interior.Item;
-            set => _interior.Item = value;
+            get => interior.Item;
+            set => interior.Item = value;
         }
 
         public Func<Item, bool> IsValidItem {
-            get => _interior.IsValidItem;
-            set => _interior.IsValidItem = value;
+            get => interior.IsValidItem;
+            set => interior.IsValidItem = value;
         }
 
         public float Scale {
-            get => _interior.Scale;
-            set => _interior.Scale = value;
+            get => interior.Scale;
+            set {
+                interior.Scale = value;
+                CalculateSize(this, TickOffsetX, TickOffsetY);
+            }
         }
 
         public bool ForceToggleButton {
-            get => _forceToggleButton;
+            get => forceToggleButton;
             set {
-                _forceToggleButton = value;
+                forceToggleButton = value;
                 bool hasButton = ForceToggleButton || UIUtils.HasToggleButton(Context);
 
                 if(!hasButton) {
-                    if(_toggleButton == null) return;
+                    if(toggleButton == null) return;
 
-                    RemoveChild(_toggleButton);
-                    _toggleButton = null;
+                    RemoveChild(toggleButton);
+                    toggleButton = null;
                 }
                 else {
-                    _toggleButton = new ToggleButton();
-                    Append(_toggleButton);
+                    toggleButton = new ToggleVisibilityButton();
+                    Append(toggleButton);
                 }
             }
         }
 
         public CustomSlot(int context = ItemSlot.Context.InventoryItem, float scale = 1f,
             ArmorType defaultArmorIcon = ArmorType.HeadArmor) {
-            _interior = new SlotInterior(
-                scale,
+            Texture2D backgroundTexture = UIUtils.GetBackgroundTexture(context);
+
+            interior = new SlotInterior(
                 context,
+                scale,
                 null,
-                new CroppedTexture2D(UIUtils.GetBackgroundTexture(context)),
+                new CroppedTexture2D(backgroundTexture),
                 UIUtils.GetEmptyTexture(context, defaultArmorIcon));
+
+            Append(interior);
+
+            ItemVisible = true;
+            ForceToggleButton = false;
+
+            CalculateSize(this, TickOffsetX, TickOffsetY);
         }
 
-        internal class SlotInterior : UIElement {
-            private Item _item;
-            private float _scale;
+        internal static void CalculateSize(ICustomSlot slot, int offsetX, int offsetY) {
+            if(slot.BackgroundTexture == CroppedTexture2D.Empty) return;
 
-            internal int Context { get; }
-            internal Func<Item, bool> IsValidItem { get; set; }
-            internal CroppedTexture2D BackgroundTexture { get; }
-            internal CroppedTexture2D EmptyTexture { get; }
+            float width = (slot.BackgroundTexture.Texture.Width * slot.Scale) + offsetX;
+            float height = (slot.BackgroundTexture.Texture.Height * slot.Scale) + offsetY;
 
-            internal Item Item {
-                get => _item;
-                set => _item = value;
+            UIElement element = (UIElement)slot;
+            element.Width.Set(width, 0f);
+            element.Height.Set(height, 0f);
+        }
+
+        internal class SlotInterior : UIElement, ICustomSlot {
+            private Item item;
+            private CroppedTexture2D backgroundTexture;
+            private float scale;
+
+            public int Context { get; }
+            public Func<Item, bool> IsValidItem { get; set; }
+            public CroppedTexture2D EmptyTexture { get; set; }
+
+            public Item Item {
+                get => item;
+                set => item = value;
             }
 
-            internal float Scale {
-                get => _scale;
+            public CroppedTexture2D BackgroundTexture {
+                get => backgroundTexture;
                 set {
-                    _scale = value;
-                    CalculateSize();
+                    backgroundTexture = value;
+                    CalculateSize(this, 0, 0);
                 }
             }
 
-            internal SlotInterior(float scale, int context, Func<Item, bool> isValidItem,
+            public float Scale {
+                get => scale;
+                set {
+                    scale = value;
+                    CalculateSize(this, 0, 0);
+                }
+            }
+
+            internal SlotInterior(int context, float scale, Func<Item, bool> isValidItem,
                 CroppedTexture2D backgroundTexture, CroppedTexture2D emptyTexture) {
-                Scale = scale;
                 Context = context;
+                Scale = scale;
                 IsValidItem = isValidItem;
                 BackgroundTexture = backgroundTexture;
                 EmptyTexture = emptyTexture;
@@ -116,7 +162,7 @@ namespace CustomSlot {
                     CustomSlot parent = (CustomSlot)Parent;
 
                     if(IsValidItem == null || IsValidItem(Main.mouseItem)) {
-                        ItemSlot.Handle(ref _item, Context);
+                        ItemSlot.Handle(ref item, Context);
                     }
                 }
             }
@@ -168,20 +214,10 @@ namespace CustomSlot {
                         0f);
                 }
             }
-
-            /// <summary>
-            /// Calculate the size of the slot based on its background texture and scale.
-            /// </summary>
-            internal void CalculateSize() {
-                if(BackgroundTexture == CroppedTexture2D.Empty) return;
-
-                Width.Set(BackgroundTexture.Texture.Width * Scale, 0f);
-                Height.Set(BackgroundTexture.Texture.Height * Scale, 0f);
-            }
         }
 
-        internal class ToggleButton : UIElement {
-            internal ToggleButton() {
+        internal class ToggleVisibilityButton : UIElement {
+            internal ToggleVisibilityButton() {
                 Width.Set(Main.inventoryTickOnTexture.Width, 0f);
                 Height.Set(Main.inventoryTickOnTexture.Height, 0f);
 
