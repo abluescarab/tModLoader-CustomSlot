@@ -168,11 +168,12 @@ namespace CustomSlot {
             }
 
             protected override void DrawSelf(SpriteBatch spriteBatch) {
-                Rectangle rectangle = GetDimensions().ToRectangle();
+                //Rectangle rectangle = GetDimensions().ToRectangle();
+                Rectangle parentRectangle = Parent.GetDimensions().ToRectangle();
 
                 spriteBatch.Draw(
                     BackgroundTexture.Texture,
-                    rectangle.TopLeft(),
+                    parentRectangle.TopLeft() + new Vector2(0, TickOffsetY),
                     BackgroundTexture.Rectangle,
                     Color.White * 0.8f,
                     0f,
@@ -181,14 +182,29 @@ namespace CustomSlot {
                     SpriteEffects.None,
                     1f);
 
-                DrawForeground(spriteBatch, rectangle);
+                DrawForeground(spriteBatch);
+
+                //spriteBatch.Draw(
+                //    BackgroundTexture.Texture,
+                //    rectangle.TopLeft(),
+                //    BackgroundTexture.Rectangle,
+                //    Color.White * 0.8f,
+                //    0f,
+                //    Vector2.Zero,
+                //    Scale,
+                //    SpriteEffects.None,
+                //    1f);
+
+                //DrawForeground(spriteBatch, rectangle);
             }
 
-            protected void DrawForeground(SpriteBatch spriteBatch, Rectangle rectangle) {
+            protected void DrawForeground(SpriteBatch spriteBatch) {
+                Rectangle rectangle = GetDimensions().ToRectangle();
+
                 if(Item.stack <= 0) {
                     spriteBatch.Draw(
                         EmptyTexture.Texture,
-                        rectangle.Center(),
+                        rectangle.Center() + new Vector2(0, TickOffsetY),
                         EmptyTexture.Rectangle,
                         Color.White * 0.35f,
                         0f,
@@ -236,7 +252,7 @@ namespace CustomSlot {
                     slot.ItemVisible ? Main.inventoryTickOnTexture : Main.inventoryTickOffTexture;
                 //int x = (int)(parentRectangle.Right - 2 - (tickTexture.Width / 2f * slot.Scale));
 
-                Left.Set(parentRectangle.Width * slot.Scale, 0f);
+                //Left.Set(parentRectangle.Width * slot.Scale, 0f);
                 //Left.Set(parentRectangle.Width - 2 - (tickTexture.Width / 2f * slot.Scale), 0f);
                 //Rectangle tickRectangle = new Rectangle(
                 //    (int)(parentRectangle.Right - 2 - (tickTexture.Width / 2f * slot.Scale)),
@@ -246,11 +262,11 @@ namespace CustomSlot {
 
                 //Left.Set(parentRectangle.Width + 2, 0f);
                 //spriteBatch.Draw(tickTexture, tickRectangle, Color.White * 0.7f);
+
+                Left.Set(parentRectangle.Width - Width.Pixels + TickOffsetX, 0f);
                 spriteBatch.Draw(
                     tickTexture,
-                    new Vector2(
-                        parentRectangle.Right - 2 - (tickTexture.Width / 2f * slot.Scale),
-                        parentRectangle.Top - 2),
+                    new Vector2(parentRectangle.Right - tickTexture.Width + TickOffsetX, parentRectangle.Top),
                     //tickRectangle,
                     Color.White * 0.7f);
             }
@@ -260,6 +276,8 @@ namespace CustomSlot {
 
                 if(ContainsPoint(Main.MouseScreen) && !PlayerInput.IgnoreMouseInterface) {
                     Main.LocalPlayer.mouseInterface = true;
+
+                    
                 }
             }
         }
