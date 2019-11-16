@@ -204,13 +204,15 @@ namespace CustomSlot {
                 Rectangle rectangle = GetDimensions().ToRectangle();
 
                 if(Item.stack <= 0) {
+                    ModContent.GetInstance<WingSlot.WingSlot>().Logger.Info(rectangle.Size());
+                    // TODO: fix empty icon drawing
                     spriteBatch.Draw(
                         EmptyTexture.Texture,
-                        rectangle.Center() + new Vector2(0, TickOffsetY),
+                        rectangle.Center(),
                         EmptyTexture.Rectangle,
                         Color.White * 0.35f,
                         0f,
-                        EmptyTexture.Rectangle.Center(),
+                        Vector2.Zero,
                         Scale,
                         SpriteEffects.None,
                         0f);
@@ -373,7 +375,7 @@ namespace CustomSlot {
             if(frame == -1) return new CroppedTexture2D();
 
             Texture2D extraTextures = Main.extraTexture[54];
-            Rectangle rectangle = extraTextures.Frame(3, 6, frame % 3, frame % 3);
+            Rectangle rectangle = extraTextures.Frame(3, 6, frame % 3, frame / 3);
             rectangle.Width -= 2;
             rectangle.Height -= 2;
 
@@ -391,156 +393,60 @@ namespace CustomSlot {
     }
 }
 
-//            protected void DrawForeground(SpriteBatch spriteBatch, Rectangle rectangle) {
-//                if(Item.stack <= 0) {
-//                    spriteBatch.Draw(
-//                        EmptyTexture.Texture,
-//                        rectangle.Center(),
-//                        EmptyTexture.Rectangle,
-//                        Color.White * 0.35f,
-//                        0f,
-//                        EmptyTexture.Rectangle.Center(),
-//                        Scale,
-//                        SpriteEffects.None,
-//                        0f);
-//                }
-//                else {
-//                    Texture2D itemTexture = Main.itemTexture[Item.type];
-//                    Rectangle itemRectangle = Main.itemAnimations[Item.type] != null
-//                        ? Main.itemAnimations[Item.type].GetFrame(itemTexture) : itemTexture.Frame();
+//private void Draw(SpriteBatch spriteBatch, Rectangle rectangle) {
+//    spriteBatch.Draw(
+//        _backTexture,
+//        rectangle.TopLeft(),
+//        null,
+//        Color.White * 0.8f,
+//        0f,
+//        Vector2.Zero,
+//        Scale,
+//        SpriteEffects.None,
+//        1f);
 
-//                    spriteBatch.Draw(
-//                        itemTexture,
-//                        rectangle.Center(),
-//                        itemRectangle,
-//                        Color.White,
-//                        0f,
-//                        itemRectangle.Center(),
-//                        Scale,
-//                        SpriteEffects.None,
-//                        0f);
-//                }
-//            }
+//    if(Item.stack > 0) {
+//        Texture2D itemTex = Main.itemTexture[Item.type];
+//        Rectangle itemRect = Main.itemAnimations[Item.type] != null ?
+//            Main.itemAnimations[Item.type].GetFrame(itemTex) :
+//            itemTex.Frame(1, 1, 0, 0);
 
-//        //    //            public override void Update(GameTime gameTime) {
-//        //    //                base.Update(gameTime);
+//        Vector2 position = new Rectangle(itemRect.X, itemRect.Y, itemRect.Width, itemRect.Height).Center.ToVector2();
 
-//        //    //                if(ContainsPoint(Main.MouseScreen) && !PlayerInput.IgnoreMouseInterface) {
-//        //    //                    Main.LocalPlayer.mouseInterface = true;
+//        spriteBatch.Draw(
+//            itemTex,
+//            position,
+//            itemRect,
+//            Color.White,
+//            0f,
+//            itemRect.Size() / 2f,
+//            Scale,
+//            SpriteEffects.None,
+//            0f);
 
-//        //    //                    if(IsValidItem == null || IsValidItem(Main.mouseItem)) {
-//        //    //                        ItemSlot.Handle(ref _item, Context);
-//        //    //                    }
-//        //    //                }
-//        //    //            }
-
-//        //    //            protected override void DrawSelf(SpriteBatch spriteBatch) {
-//        //    //                Rectangle rectangle = GetDimensions().ToRectangle();
-
-//        //    //                spriteBatch.Draw(
-//        //    //                    BackgroundTexture.Texture,
-//        //    //                    rectangle.TopLeft(),
-//        //    //                    BackgroundTexture.Rectangle,
-//        //    //                    Color.White * 0.8f,
-//        //    //                    0f,
-//        //    //                    Vector2.Zero,
-//        //    //                    Scale,
-//        //    //                    SpriteEffects.None,
-//        //    //                    1f);
-
-//        //    //                DrawForeground(spriteBatch, rectangle);
-//        //    //            }
-
-//        //    //            protected void DrawForeground(SpriteBatch spriteBatch, Rectangle rectangle) {
-//        //    //                if(Item.stack <= 0) {
-//        //    //                    spriteBatch.Draw(
-//        //    //                        EmptyTexture.Texture,
-//        //    //                        rectangle.Center(),
-//        //    //                        EmptyTexture.Rectangle,
-//        //    //                        Color.White * 0.35f,
-//        //    //                        0f,
-//        //    //                        EmptyTexture.Rectangle.Center(),
-//        //    //                        Scale,
-//        //    //                        SpriteEffects.None,
-//        //    //                        0f);
-//        //    //                }
-//        //    //                else {
-//        //    //                    Texture2D itemTexture = Main.itemTexture[Item.type];
-//        //    //                    Rectangle itemRectangle = Main.itemAnimations[Item.type] != null
-//        //    //                        ? Main.itemAnimations[Item.type].GetFrame(itemTexture) : itemTexture.Frame();
-
-//        //    //                    spriteBatch.Draw(
-//        //    //                        itemTexture,
-//        //    //                        rectangle.Center(),
-//        //    //                        itemRectangle,
-//        //    //                        Color.White,
-//        //    //                        0f,
-//        //    //                        itemRectangle.Center(),
-//        //    //                        Scale,
-//        //    //                        SpriteEffects.None,
-//        //    //                        0f);
-//        //    //                }
-//        //    //            }
-
-//        //    }
-
-//        //    //        private void Draw(SpriteBatch spriteBatch, Rectangle rectangle) {
-//        //    //            spriteBatch.Draw(
-//        //    //                _backTexture,
-//        //    //                rectangle.TopLeft(),
-//        //    //                null,
-//        //    //                Color.White * 0.8f,
-//        //    //                0f,
-//        //    //                Vector2.Zero,
-//        //    //                Scale,
-//        //    //                SpriteEffects.None,
-//        //    //                1f);
-
-//        //    //            if(Item.stack > 0) {
-//        //    //                Texture2D itemTex = Main.itemTexture[Item.type];
-//        //    //                Rectangle itemRect = Main.itemAnimations[Item.type] != null ?
-//        //    //                    Main.itemAnimations[Item.type].GetFrame(itemTex) :
-//        //    //                    itemTex.Frame(1, 1, 0, 0);
-
-//        //    //                Vector2 position = new Rectangle(itemRect.X, itemRect.Y, itemRect.Width, itemRect.Height).Center.ToVector2();
-
-//        //    //                spriteBatch.Draw(
-//        //    //                    itemTex,
-//        //    //                    position,
-//        //    //                    itemRect,
-//        //    //                    Color.White,
-//        //    //                    0f,
-//        //    //                    itemRect.Size() / 2f,
-//        //    //                    Scale,
-//        //    //                    SpriteEffects.None,
-//        //    //                    0f);
-
-//        //    //                // TODO: fix number text
-//        //    //                ChatManager.DrawColorCodedStringWithShadow(
-//        //    //                    spriteBatch,
-//        //    //                    Main.fontItemStack,
-//        //    //                    Item.stack.ToString(),
-//        //    //                    position + new Vector2(10f, 26f) * Scale,
-//        //    //                    Color.White,
-//        //    //                    0f,
-//        //    //                    Vector2.Zero,
-//        //    //                    new Vector2(Scale),
-//        //    //                    -1f,
-//        //    //                    Scale);
-//        //    //            }
-//        //    //            else if(Item.stack == 0 && ValidItemTexture != null) {
-//        //    //                spriteBatch.Draw(
-//        //    //                    ValidItemTexture,
-//        //    //                    rectangle.TopLeft() + (rectangle.Size() / 2f),
-//        //    //                    null,
-//        //    //                    Color.White * 0.35f,
-//        //    //                    0f,
-//        //    //                    ValidItemTexture.Size() / 2f,
-//        //    //                    Scale,
-//        //    //                    SpriteEffects.None,
-//        //    //                    0f); // layer depth 0 = front
-//        //    //            }
-//        //    //        }
-
+//        // TODO: fix number text
+//        ChatManager.DrawColorCodedStringWithShadow(
+//            spriteBatch,
+//            Main.fontItemStack,
+//            Item.stack.ToString(),
+//            position + new Vector2(10f, 26f) * Scale,
+//            Color.White,
+//            0f,
+//            Vector2.Zero,
+//            new Vector2(Scale),
+//            -1f,
+//            Scale);
+//    }
+//    else if(Item.stack == 0 && ValidItemTexture != null) {
+//        spriteBatch.Draw(
+//            ValidItemTexture,
+//            rectangle.TopLeft() + (rectangle.Size() / 2f),
+//            null,
+//            Color.White * 0.35f,
+//            0f,
+//            ValidItemTexture.Size() / 2f,
+//            Scale,
+//            SpriteEffects.None,
+//            0f); // layer depth 0 = front
 //    }
 //}
