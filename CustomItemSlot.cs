@@ -14,7 +14,7 @@ using Terraria.UI;
  */
 
 namespace CustomSlot {
-    public class CustomSlot : UIElement, ICustomSlot {
+    public class CustomItemSlot : UIElement, ICustomSlot {
         public enum ArmorType {
             HeadArmor,
             ChestArmor,
@@ -67,7 +67,7 @@ namespace CustomSlot {
             get => forceToggleButton;
             set {
                 forceToggleButton = value;
-                bool hasButton = ForceToggleButton || UIUtils.HasToggleButton(Context);
+                bool hasButton = ForceToggleButton || HasToggleButton(Context);
 
                 if(!hasButton) {
                     if(toggleButton == null) return;
@@ -82,16 +82,16 @@ namespace CustomSlot {
             }
         }
 
-        public CustomSlot(int context = ItemSlot.Context.InventoryItem, float scale = 1f,
+        public CustomItemSlot(int context = ItemSlot.Context.InventoryItem, float scale = 1f,
             ArmorType defaultArmorIcon = ArmorType.HeadArmor) {
-            Texture2D backgroundTexture = UIUtils.GetBackgroundTexture(context);
+            Texture2D backgroundTexture = GetBackgroundTexture(context);
 
             interior = new SlotInterior(
                 context,
                 scale,
                 null,
                 new CroppedTexture2D(backgroundTexture),
-                UIUtils.GetEmptyTexture(context, defaultArmorIcon));
+                GetEmptyTexture(context, defaultArmorIcon));
 
             Append(interior);
 
@@ -159,7 +159,9 @@ namespace CustomSlot {
                 if(ContainsPoint(Main.MouseScreen) && !PlayerInput.IgnoreMouseInterface) {
                     Main.LocalPlayer.mouseInterface = true;
 
-                    CustomSlot parent = (CustomSlot)Parent;
+                    CustomItemSlot parent = (CustomItemSlot)Parent;
+
+                    if(parent.toggleButton != null && parent.toggleButton.ContainsPoint(Main.MouseScreen)) return;
 
                     if(IsValidItem == null || IsValidItem(Main.mouseItem)) {
                         ItemSlot.Handle(ref item, Context);
@@ -238,32 +240,21 @@ namespace CustomSlot {
                 Height.Set(Main.inventoryTickOnTexture.Height, 0f);
 
                 OnClick += (evt, element) => {
-                    if(!(element.Parent is CustomSlot slot)) return;
+                    if(!(element.Parent is CustomItemSlot slot)) return;
 
                     slot.ItemVisible = !slot.ItemVisible;
                 };
             }
 
             protected override void DrawSelf(SpriteBatch spriteBatch) {
-                if(!(Parent is CustomSlot slot)) return;
+                if(!(Parent is CustomItemSlot slot)) return;
 
                 Rectangle parentRectangle = Parent.GetDimensions().ToRectangle();
                 Texture2D tickTexture =
                     slot.ItemVisible ? Main.inventoryTickOnTexture : Main.inventoryTickOffTexture;
-                //int x = (int)(parentRectangle.Right - 2 - (tickTexture.Width / 2f * slot.Scale));
-
-                //Left.Set(parentRectangle.Width * slot.Scale, 0f);
-                //Left.Set(parentRectangle.Width - 2 - (tickTexture.Width / 2f * slot.Scale), 0f);
-                //Rectangle tickRectangle = new Rectangle(
-                //    (int)(parentRectangle.Right - 2 - (tickTexture.Width / 2f * slot.Scale)),
-                //    parentRectangle.Top - 2,
-                //    tickTexture.Width,
-                //    tickTexture.Height);
-
-                //Left.Set(parentRectangle.Width + 2, 0f);
-                //spriteBatch.Draw(tickTexture, tickRectangle, Color.White * 0.7f);
 
                 Left.Set(parentRectangle.Width - Width.Pixels + TickOffsetX, 0f);
+
                 spriteBatch.Draw(
                     tickTexture,
                     new Vector2(parentRectangle.Right - tickTexture.Width + TickOffsetX, parentRectangle.Top),
@@ -276,90 +267,129 @@ namespace CustomSlot {
 
                 if(ContainsPoint(Main.MouseScreen) && !PlayerInput.IgnoreMouseInterface) {
                     Main.LocalPlayer.mouseInterface = true;
-
-                    
                 }
             }
         }
+
+        /// <summary>
+        /// Get the background texture of a slot based on its context.
+        /// </summary>
+        /// <param name="context">slot context</param>
+        /// <returns>background texture of the slot</returns>
+        public static Texture2D GetBackgroundTexture(int context) {
+            switch(context) {
+                case ItemSlot.Context.EquipAccessory:
+                case ItemSlot.Context.EquipArmor:
+                case ItemSlot.Context.EquipGrapple:
+                case ItemSlot.Context.EquipMount:
+                case ItemSlot.Context.EquipMinecart:
+                case ItemSlot.Context.EquipPet:
+                case ItemSlot.Context.EquipLight:
+                    return Main.inventoryBack3Texture;
+                case ItemSlot.Context.EquipArmorVanity:
+                case ItemSlot.Context.EquipAccessoryVanity:
+                    return Main.inventoryBack8Texture;
+                case ItemSlot.Context.EquipDye:
+                    return Main.inventoryBack12Texture;
+                case ItemSlot.Context.ChestItem:
+                    return Main.inventoryBack5Texture;
+                case ItemSlot.Context.BankItem:
+                    return Main.inventoryBack2Texture;
+                case ItemSlot.Context.GuideItem:
+                case ItemSlot.Context.PrefixItem:
+                case ItemSlot.Context.CraftingMaterial:
+                    return Main.inventoryBack4Texture;
+                case ItemSlot.Context.TrashItem:
+                    return Main.inventoryBack7Texture;
+                case ItemSlot.Context.ShopItem:
+                    return Main.inventoryBack6Texture;
+                default:
+                    return Main.inventoryBackTexture;
+            }
+        }
+
+        /// <summary>
+        /// Get the empty texture of a slot based on its context.
+        /// </summary>
+        /// <param name="context">slot context</param>
+        /// <param name="armorType">type of equipment in the slot</param>
+        /// <returns>empty texture of the slot</returns>
+        public static CroppedTexture2D GetEmptyTexture(int context, CustomItemSlot.ArmorType armorType = CustomItemSlot.ArmorType.HeadArmor) {
+            int frame = -1;
+
+            switch(context) {
+                case ItemSlot.Context.EquipArmor:
+                    switch(armorType) {
+                        case CustomItemSlot.ArmorType.HeadArmor:
+                            frame = 0;
+                            break;
+                        case CustomItemSlot.ArmorType.ChestArmor:
+                            frame = 6;
+                            break;
+                        case CustomItemSlot.ArmorType.LegArmor:
+                            frame = 12;
+                            break;
+                    }
+                    break;
+                case ItemSlot.Context.EquipArmorVanity:
+                    switch(armorType) {
+                        case CustomItemSlot.ArmorType.HeadArmor:
+                            frame = 3;
+                            break;
+                        case CustomItemSlot.ArmorType.ChestArmor:
+                            frame = 9;
+                            break;
+                        case CustomItemSlot.ArmorType.LegArmor:
+                            frame = 15;
+                            break;
+                    }
+                    break;
+                case ItemSlot.Context.EquipAccessory:
+                    frame = 11;
+                    break;
+                case ItemSlot.Context.EquipAccessoryVanity:
+                    frame = 2;
+                    break;
+                case ItemSlot.Context.EquipDye:
+                    frame = 1;
+                    break;
+                case ItemSlot.Context.EquipGrapple:
+                    frame = 4;
+                    break;
+                case ItemSlot.Context.EquipMount:
+                    frame = 13;
+                    break;
+                case ItemSlot.Context.EquipMinecart:
+                    frame = 7;
+                    break;
+                case ItemSlot.Context.EquipPet:
+                    frame = 10;
+                    break;
+                case ItemSlot.Context.EquipLight:
+                    frame = 17;
+                    break;
+            }
+
+            if(frame == -1) return new CroppedTexture2D();
+
+            Texture2D extraTextures = Main.extraTexture[54];
+            Rectangle rectangle = extraTextures.Frame(3, 6, frame % 3, frame % 3);
+            rectangle.Width -= 2;
+            rectangle.Height -= 2;
+
+            return new CroppedTexture2D(extraTextures, rectangle);
+        }
+
+        /// <summary>
+        /// Whether the slot has a visibility toggle button.
+        /// </summary>
+        public static bool HasToggleButton(int context) {
+            return context == ItemSlot.Context.EquipAccessory ||
+                   context == ItemSlot.Context.EquipLight ||
+                   context == ItemSlot.Context.EquipPet;
+        }
     }
 }
-
-
-
-
-//using System;
-//using Microsoft.Xna.Framework;
-//using Microsoft.Xna.Framework.Graphics;
-//using Terraria;
-//using Terraria.GameInput;
-//using Terraria.UI;
-
-
-//namespace CustomSlotter {
-//    public class CustomSlot : UIElement {
-//        public enum ArmorType {
-//            HeadArmor,
-//            ChestArmor,
-//            LegArmor
-//        }
-
-//        private SlotInterior _interior;
-//        private ToggleButton _toggleButton;
-//        private float _scale;
-//        private CroppedTexture2D _backgroundTexture;
-//        private CroppedTexture2D _emptyTexture;
-//        private bool _forceToggleButton;
-//        private Item _item;
-//        private int _context;
-//        private Func<Item, bool> _isValidItem;
-//        private bool _itemVisible;
-
-//        public CustomSlot(int context = ItemSlot.Context.InventoryItem, float scale = 1f, ArmorType defaultArmorIcon = ArmorType.HeadArmor) {
-//            _interior = new SlotInterior();
-
-//            _context = context;
-//            _scale = scale;
-//            _forceToggleButton = false;
-//            _isValidItem = null;
-//            _itemVisible = true;
-//            _backgroundTexture = new CroppedTexture2D(UIUtils.GetBackgroundTexture(context));
-//            _emptyTexture = UIUtils.GetEmptyTexture(context, defaultArmorIcon);
-//            _item = new Item();
-
-//            _item.SetDefaults();
-//        }
-
-//        internal class SlotInterior : UIElement {
-//            public override void Update(GameTime gameTime) {
-//                base.Update(gameTime);
-
-//                if(ContainsPoint(Main.MouseScreen) && !PlayerInput.IgnoreMouseInterface) {
-//                    Main.LocalPlayer.mouseInterface = true;
-
-//                    CustomSlot parent = (CustomSlot)Parent;
-
-//                    if(parent._isValidItem == null || IsValidItem(Main.mouseItem)) {
-//                        ItemSlot.Handle(ref _item, Context);
-//                    }
-//                }
-//            }
-
-//            protected override void DrawSelf(SpriteBatch spriteBatch) {
-//                Rectangle rectangle = GetDimensions().ToRectangle();
-
-//                spriteBatch.Draw(
-//                    BackgroundTexture.Texture,
-//                    rectangle.TopLeft(),
-//                    BackgroundTexture.Rectangle,
-//                    Color.White * 0.8f,
-//                    0f,
-//                    Vector2.Zero,
-//                    Scale,
-//                    SpriteEffects.None,
-//                    1f);
-
-//                DrawForeground(spriteBatch, rectangle);
-//            }
 
 //            protected void DrawForeground(SpriteBatch spriteBatch, Rectangle rectangle) {
 //                if(Item.stack <= 0) {
@@ -391,152 +421,6 @@ namespace CustomSlot {
 //                        0f);
 //                }
 //            }
-
-//            /// <summary>
-//            /// Calculate the size of the slot based on its background texture and scale.
-//            /// </summary>
-//            internal void CalculateSize() {
-//                if((Parent as CustomSlot).BackgroundTexture == CroppedTexture2D.Empty) return;
-
-//                Width.Set(BackgroundTexture.Texture.Width * Scale, 0f);
-//                Height.Set(BackgroundTexture.Texture.Height * Scale, 0f);
-//            }
-//        }
-
-//        internal class ToggleButton : UIElement {
-
-//        }
-
-//        //public bool ForceToggleButton {
-//        //    get => _forceToggleButton;
-//        //    set {
-//        //        _forceToggleButton = value;
-//        //        bool hasButton = ForceToggleButton || UIUtils.HasToggleButton(_slotInterior.Context);
-
-//        //        if(!hasButton) {
-//        //            if(_toggleButton == null) return;
-
-//        //            RemoveChild(_toggleButton);
-//        //            _toggleButton = null;
-//        //        }
-//        //        else {
-//        //            _toggleButton = new ToggleButton();
-//        //            Append(_toggleButton);
-//        //        }
-//        //    }
-//        //}
-
-//        //internal CustomSlot(int context = ItemSlot.Context.InventoryItem, float scale = 1f, ArmorType armorIcon = ArmorType.HeadArmor) {
-//        //    _slotInterior = new SlotInterior(context, new CroppedTexture2D(UIUtils.GetBackgroundTexture(context)), UIUtils.GetEmptyTexture(context, armorIcon));
-//        //}
-
-//        //internal class SlotInterior : UIElement {
-//        //    private Item _item;
-
-//        //    internal Item Item => _item;
-//        //    internal int Context { get; }
-//        //    internal CroppedTexture2D BackgroundTexture { get; }
-//        //    internal CroppedTexture2D EmptyTexture { get; }
-//        //    internal Func<Item, bool> IsValidItem { get; set; }
-
-//        //    internal SlotInterior(int context, CroppedTexture2D backgroundTexture, CroppedTexture2D emptyTexture, Func<Item, bool> isValidItem) {
-//        //        Context = context;
-//        //        BackgroundTexture = backgroundTexture;
-//        //        EmptyTexture = emptyTexture;
-//        //        IsValidItem = isValidItem;
-//        //    }
-//        //}
-
-//        //internal class ToggleButton : UIElement {
-//        //    private bool _visible;
-//        //}
-
-//        //private ToggleButton _toggleButton;
-//        //private SlotInterior _interior;
-//        //private Item _item;
-//        //private bool _forceToggleButton;
-//        //private float _scale;
-
-//        ///// <summary>
-//        ///// If the slot is for equipment, whether the item in the slot is visible.
-//        ///// </summary>
-//        //public bool ItemVisible { get; set; }
-//        ///// <summary>
-//        ///// The item in the slot.
-//        ///// </summary>
-//        //public Item Item => _item;
-//        ///// <summary>
-//        ///// The <see cref="ItemSlot"/>.Context of the slot.
-//        ///// </summary>
-//        //public int Context { get; }
-//        ///// <summary>
-//        ///// The scale of the slot.
-//        ///// </summary>
-//        //public float Scale {
-//        //    get => _scale;
-//        //    set {
-//        //        _scale = value;
-//        //        _interior.CalculateSize();
-//        //    }
-//        //}
-//        ///// <summary>
-//        ///// The function to check if the item is valid before placing it in the slot.
-//        ///// </summary>
-//        //public Func<Item, bool> IsValidItem { get; }
-//        ///// <summary>
-//        ///// Whether to force a visibility toggle button on the slot.
-//        ///// </summary>
-//        //public bool ForceToggleButton {
-//        //    get => _forceToggleButton;
-//        //    set {
-//        //        _forceToggleButton = value;
-//        //        bool hasButton = ForceToggleButton || UIUtils.HasToggleButton(Context);
-
-//        //        if(!hasButton) {
-//        //            if(_toggleButton == null) return;
-
-//        //            RemoveChild(_toggleButton);
-//        //            _toggleButton = null;
-//        //        }
-//        //        else {
-//        //            _toggleButton = new ToggleButton();
-//        //            Append(_toggleButton);
-//        //        }
-//        //    }
-//        //}
-
-//        //public CustomSlot(int context = ItemSlot.Context.InventoryItem, float scale = 1f,
-//        //    ArmorType armorIcon = ArmorType.HeadArmor) {
-//        //    _interior = new SlotInterior() {
-//        //        BackgroundTexture = new CroppedTexture2D(UIUtils.GetBackgroundTexture(context)),
-//        //        EmptyTexture = UIUtils.GetEmptyTexture(context, armorIcon)
-//        //    };
-
-//        //    ItemVisible = true;
-//        //    ForceToggleButton = false;
-//        //    _scale = scale;
-//        //    _item = new Item();
-//        //    _item.SetDefaults();
-//        //    _interior.CalculateSize();
-//        //}
-
-//        //internal class SlotInterior : UIElement {
-//        //    private CroppedTexture2D _backgroundTexture;
-
-//        //    /// <summary>
-//        //    /// The grayed-out texture displayed in the empty slot.
-//        //    /// </summary>
-//        //    public CroppedTexture2D EmptyTexture { get; set; }
-//        //    /// <summary>
-//        //    /// The background texture of the slot, determined by its context by default.
-//        //    /// </summary>
-//        //    public CroppedTexture2D BackgroundTexture {
-//        //        get => _backgroundTexture;
-//        //        set {
-//        //            _backgroundTexture = value;
-//        //            CalculateSize();
-//        //        }
-//        //    }
 
 //        //    //            public override void Update(GameTime gameTime) {
 //        //    //                base.Update(gameTime);
@@ -598,67 +482,6 @@ namespace CustomSlot {
 //        //    //                }
 //        //    //            }
 
-//        //    /// <summary>
-//        //    /// Calculate the size of the slot based on its background texture and scale.
-//        //    /// </summary>
-//        //    internal void CalculateSize() {
-//        //        if((Parent as CustomSlot).BackgroundTexture == CroppedTexture2D.Empty) return;
-
-//        //        Width.Set(BackgroundTexture.Texture.Width * Scale, 0f);
-//        //        Height.Set(BackgroundTexture.Texture.Height * Scale, 0f);
-//        //    }
-//        //}
-
-//        //internal class ToggleButton : UIElement {
-//        //    internal ToggleButton() {
-//        //        Width.Set(Main.inventoryTickOnTexture.Width, 0f);
-//        //        Height.Set(Main.inventoryTickOnTexture.Height, 0f);
-//        //        //Top.Set(-2, 0f);
-
-//        //        //ModContent.GetInstance<Mod>().Logger.Info(Main.inventoryTickOnTexture.Width);
-
-//        //        OnClick += (evt, element) => {
-//        //            if(!(element.Parent is CustomSlot slot)) return;
-
-//        //            slot.ItemVisible = !slot.ItemVisible;
-//        //        };
-//        //    }
-
-//        //    protected override void DrawSelf(SpriteBatch spriteBatch) {
-//        //        if(!(Parent is CustomSlot slot)) return;
-
-//        //        Rectangle parentRectangle = Parent.GetDimensions().ToRectangle();
-//        //        Texture2D tickTexture =
-//        //            slot.ItemVisible ? Main.inventoryTickOnTexture : Main.inventoryTickOffTexture;
-//        //        //int x = (int)(parentRectangle.Right - 2 - (tickTexture.Width / 2f * slot.Scale));
-
-//        //        Left.Set(parentRectangle.Width * slot.Scale, 0f);
-//        //        //Left.Set(parentRectangle.Width - 2 - (tickTexture.Width / 2f * slot.Scale), 0f);
-//        //        //Rectangle tickRectangle = new Rectangle(
-//        //        //    (int)(parentRectangle.Right - 2 - (tickTexture.Width / 2f * slot.Scale)),
-//        //        //    parentRectangle.Top - 2,
-//        //        //    tickTexture.Width,
-//        //        //    tickTexture.Height);
-
-//        //        //Left.Set(parentRectangle.Width + 2, 0f);
-//        //        //spriteBatch.Draw(tickTexture, tickRectangle, Color.White * 0.7f);
-//        //        spriteBatch.Draw(
-//        //            tickTexture,
-//        //            new Vector2(
-//        //                parentRectangle.Right - 2 - (tickTexture.Width / 2f * slot.Scale),
-//        //                parentRectangle.Top - 2),
-//        //            //tickRectangle,
-//        //            Color.White * 0.7f);
-//        //    }
-
-//        //    public override void Update(GameTime gameTime) {
-//        //        base.Update(gameTime);
-
-//        //        if(ContainsPoint(Main.MouseScreen) && !PlayerInput.IgnoreMouseInterface) {
-//        //            Main.LocalPlayer.mouseInterface = true;
-//        //        }
-//        //    }
-//        //}
 //        //    }
 
 //        //    //        private void Draw(SpriteBatch spriteBatch, Rectangle rectangle) {
@@ -719,10 +542,5 @@ namespace CustomSlot {
 //        //    //            }
 //        //    //        }
 
-//        //    //        private bool HasTick() {
-//        //    //            return _context == ItemSlot.Context.EquipAccessory ||
-//        //    //                   _context == ItemSlot.Context.EquipLight ||
-//        //    //                   _context == ItemSlot.Context.EquipPet;
-//        //    //        }
 //    }
 //}

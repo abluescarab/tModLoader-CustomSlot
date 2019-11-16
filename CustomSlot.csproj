@@ -33,10 +33,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="CustomSlot.cs" />
+    <Compile Include="CustomItemSlot.cs" />
     <Compile Include="CroppedTexture2D.cs" />
     <Compile Include="ICustomSlot.cs" />
-    <Compile Include="UIUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Xna.Framework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86">
