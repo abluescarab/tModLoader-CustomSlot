@@ -204,7 +204,6 @@ namespace CustomSlot {
                 Rectangle rectangle = GetDimensions().ToRectangle();
 
                 if(Item.stack <= 0) {
-                    ModContent.GetInstance<WingSlot.WingSlot>().Logger.Info(rectangle.Size());
                     // TODO: fix empty icon drawing
                     spriteBatch.Draw(
                         EmptyTexture.Texture,
