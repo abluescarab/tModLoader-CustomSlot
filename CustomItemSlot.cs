@@ -8,7 +8,6 @@ using Terraria.UI;
 
 /*
  * TODO: fix number text
- * TODO: tick correct location
  * TODO: equip/unequip
  * TODO: partner slot
  */
@@ -170,8 +169,18 @@ namespace CustomSlot {
             }
 
             protected override void DrawSelf(SpriteBatch spriteBatch) {
-                //Rectangle rectangle = GetDimensions().ToRectangle();
                 Rectangle parentRectangle = Parent.GetDimensions().ToRectangle();
+                Rectangle rectangle = GetDimensions().ToRectangle();
+                Texture2D itemTexture = EmptyTexture.Texture;
+                Rectangle itemRectangle = EmptyTexture.Rectangle;
+                Color color = Color.White * 0.35f;
+
+                if(Item.stack > 0) {
+                    itemTexture = Main.itemTexture[Item.type];
+                    itemRectangle = Main.itemAnimations[Item.type] != null
+                        ? Main.itemAnimations[Item.type].GetFrame(itemTexture) : itemTexture.Frame();
+                    color = Color.White;
+                }
 
                 spriteBatch.Draw(
                     BackgroundTexture.Texture,
@@ -184,54 +193,17 @@ namespace CustomSlot {
                     SpriteEffects.None,
                     1f);
 
-                DrawForeground(spriteBatch);
-
-                //spriteBatch.Draw(
-                //    BackgroundTexture.Texture,
-                //    rectangle.TopLeft(),
-                //    BackgroundTexture.Rectangle,
-                //    Color.White * 0.8f,
-                //    0f,
-                //    Vector2.Zero,
-                //    Scale,
-                //    SpriteEffects.None,
-                //    1f);
-
-                //DrawForeground(spriteBatch, rectangle);
-            }
-
-            protected void DrawForeground(SpriteBatch spriteBatch) {
-                Rectangle rectangle = GetDimensions().ToRectangle();
-
-                if(Item.stack <= 0) {
-                    // TODO: fix empty icon drawing
-                    spriteBatch.Draw(
-                        EmptyTexture.Texture,
-                        rectangle.Center(),
-                        EmptyTexture.Rectangle,
-                        Color.White * 0.35f,
-                        0f,
-                        Vector2.Zero,
-                        Scale,
-                        SpriteEffects.None,
-                        0f);
-                }
-                else {
-                    Texture2D itemTexture = Main.itemTexture[Item.type];
-                    Rectangle itemRectangle = Main.itemAnimations[Item.type] != null
-                        ? Main.itemAnimations[Item.type].GetFrame(itemTexture) : itemTexture.Frame();
-
-                    spriteBatch.Draw(
-                        itemTexture,
-                        rectangle.Center(),
-                        itemRectangle,
-                        Color.White,
-                        0f,
-                        itemRectangle.Center(),
-                        Scale,
-                        SpriteEffects.None,
-                        0f);
-                }
+                spriteBatch.Draw(
+                    itemTexture,
+                    rectangle.Center(),
+                    itemRectangle,
+                    color,
+                    0f,
+                    new Vector2(itemRectangle.Center.X - itemRectangle.Location.X,
+                                itemRectangle.Center.Y - itemRectangle.Location.Y - TickOffsetY),
+                    Scale,
+                    SpriteEffects.None,
+                    0f);
             }
         }
 
@@ -259,13 +231,12 @@ namespace CustomSlot {
                 spriteBatch.Draw(
                     tickTexture,
                     new Vector2(parentRectangle.Right - tickTexture.Width + TickOffsetX, parentRectangle.Top),
-                    //tickRectangle,
                     Color.White * 0.7f);
             }
 
             public override void Update(GameTime gameTime) {
                 base.Update(gameTime);
-
+                // TODO: clicking tick doesn't work
                 if(ContainsPoint(Main.MouseScreen) && !PlayerInput.IgnoreMouseInterface) {
                     Main.LocalPlayer.mouseInterface = true;
                 }
@@ -315,32 +286,32 @@ namespace CustomSlot {
         /// <param name="context">slot context</param>
         /// <param name="armorType">type of equipment in the slot</param>
         /// <returns>empty texture of the slot</returns>
-        public static CroppedTexture2D GetEmptyTexture(int context, CustomItemSlot.ArmorType armorType = CustomItemSlot.ArmorType.HeadArmor) {
+        public static CroppedTexture2D GetEmptyTexture(int context, ArmorType armorType = ArmorType.HeadArmor) {
             int frame = -1;
 
             switch(context) {
                 case ItemSlot.Context.EquipArmor:
                     switch(armorType) {
-                        case CustomItemSlot.ArmorType.HeadArmor:
+                        case ArmorType.HeadArmor:
                             frame = 0;
                             break;
-                        case CustomItemSlot.ArmorType.ChestArmor:
+                        case ArmorType.ChestArmor:
                             frame = 6;
                             break;
-                        case CustomItemSlot.ArmorType.LegArmor:
+                        case ArmorType.LegArmor:
                             frame = 12;
                             break;
                     }
                     break;
                 case ItemSlot.Context.EquipArmorVanity:
                     switch(armorType) {
-                        case CustomItemSlot.ArmorType.HeadArmor:
+                        case ArmorType.HeadArmor:
                             frame = 3;
                             break;
-                        case CustomItemSlot.ArmorType.ChestArmor:
+                        case ArmorType.ChestArmor:
                             frame = 9;
                             break;
-                        case CustomItemSlot.ArmorType.LegArmor:
+                        case ArmorType.LegArmor:
                             frame = 15;
                             break;
                     }
