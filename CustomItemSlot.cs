@@ -3,13 +3,14 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.GameInput;
-using Terraria.ModLoader;
+using Terraria.ID;
+using Terraria.Localization;
 using Terraria.UI;
 
 /*
  * TODO: fix number text
  * TODO: equip/unequip
- * TODO: partner slot
+ * TODO: partner slot (right-clicking vanity crashes game)
  */
 
 namespace CustomSlot {
@@ -153,7 +154,7 @@ namespace CustomSlot {
                 Item = new Item();
                 Item.SetDefaults();
             }
-
+            
             protected override void DrawSelf(SpriteBatch spriteBatch) {
                 DoDraw(spriteBatch);
 
@@ -221,7 +222,7 @@ namespace CustomSlot {
 
             protected override void DrawSelf(SpriteBatch spriteBatch) {
                 if(!(Parent is CustomItemSlot slot)) return;
-
+                
                 DoDraw(spriteBatch, slot);
 
                 if(ContainsPoint(Main.MouseScreen) && !PlayerInput.IgnoreMouseInterface) {
