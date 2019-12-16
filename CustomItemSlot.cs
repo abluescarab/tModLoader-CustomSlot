@@ -29,6 +29,8 @@ namespace CustomSlot {
 
         public bool ItemVisible { get; set; }
 
+        public string HoverText { get; set; }
+
         public int Context => interior.Context;
 
         public CroppedTexture2D BackgroundTexture {
@@ -164,6 +166,10 @@ namespace CustomSlot {
 
                     if(IsValidItem == null || IsValidItem(Main.mouseItem) || Main.mouseItem.type == 0) {
                         ItemSlot.Handle(ref item, Context);
+
+                        if(!string.IsNullOrEmpty(parent.HoverText)) {
+                            Main.hoverItemName = parent.HoverText;
+                        }
                     }
                 }
             }
