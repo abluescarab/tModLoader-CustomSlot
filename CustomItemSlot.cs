@@ -163,7 +163,7 @@ namespace CustomSlot {
                     if(parent.toggleButton != null && parent.toggleButton.ContainsPoint(Main.MouseScreen)) return;
 
                     if(IsValidItem == null || IsValidItem(Main.mouseItem) || Main.mouseItem.type == 0) {
-                        WingSlot.ItemSlot.Handle(ref item, Context);
+                        ItemSlot.Handle(ref item, Context);
                     }
                 }
             }
