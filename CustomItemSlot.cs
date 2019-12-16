@@ -152,8 +152,8 @@ namespace CustomSlot {
                 Item.SetDefaults();
             }
 
-            public override void Update(GameTime gameTime) {
-                base.Update(gameTime);
+            protected override void DrawSelf(SpriteBatch spriteBatch) {
+                DoDraw(spriteBatch);
 
                 if(ContainsPoint(Main.MouseScreen) && !PlayerInput.IgnoreMouseInterface) {
                     Main.LocalPlayer.mouseInterface = true;
@@ -162,13 +162,13 @@ namespace CustomSlot {
 
                     if(parent.toggleButton != null && parent.toggleButton.ContainsPoint(Main.MouseScreen)) return;
 
-                    if(IsValidItem == null || IsValidItem(Main.mouseItem)) {
-                        ItemSlot.Handle(ref item, Context);
+                    if(IsValidItem == null || IsValidItem(Main.mouseItem) || Main.mouseItem.type == 0) {
+                        WingSlot.ItemSlot.Handle(ref item, Context);
                     }
                 }
             }
 
-            protected override void DrawSelf(SpriteBatch spriteBatch) {
+            private void DoDraw(SpriteBatch spriteBatch) {
                 Rectangle parentRectangle = Parent.GetDimensions().ToRectangle();
                 Rectangle rectangle = GetDimensions().ToRectangle();
                 Texture2D itemTexture = EmptyTexture.Texture;
@@ -211,17 +211,25 @@ namespace CustomSlot {
             internal ToggleVisibilityButton() {
                 Width.Set(Main.inventoryTickOnTexture.Width, 0f);
                 Height.Set(Main.inventoryTickOnTexture.Height, 0f);
-
-                OnClick += (evt, element) => {
-                    if(!(element.Parent is CustomItemSlot slot)) return;
-
-                    slot.ItemVisible = !slot.ItemVisible;
-                };
             }
 
             protected override void DrawSelf(SpriteBatch spriteBatch) {
                 if(!(Parent is CustomItemSlot slot)) return;
 
+                DoDraw(spriteBatch, slot);
+
+                if(ContainsPoint(Main.MouseScreen) && !PlayerInput.IgnoreMouseInterface) {
+                    Main.LocalPlayer.mouseInterface = true;
+                    Main.hoverItemName = Language.GetTextValue(slot.ItemVisible ? "LegacyInterface.59" : "LegacyInterface.60");
+
+                    if(Main.mouseLeftRelease && Main.mouseLeft) {
+                        Main.PlaySound(SoundID.MenuTick);
+                        slot.ItemVisible = !slot.ItemVisible;
+                    }
+                }
+            }
+
+            private void DoDraw(SpriteBatch spriteBatch, CustomItemSlot slot) {
                 Rectangle parentRectangle = Parent.GetDimensions().ToRectangle();
                 Texture2D tickTexture =
                     slot.ItemVisible ? Main.inventoryTickOnTexture : Main.inventoryTickOffTexture;
@@ -232,14 +240,6 @@ namespace CustomSlot {
                     tickTexture,
                     new Vector2(parentRectangle.Right - tickTexture.Width + TickOffsetX, parentRectangle.Top),
                     Color.White * 0.7f);
-            }
-
-            public override void Update(GameTime gameTime) {
-                base.Update(gameTime);
-                // TODO: clicking tick doesn't work
-                if(ContainsPoint(Main.MouseScreen) && !PlayerInput.IgnoreMouseInterface) {
-                    Main.LocalPlayer.mouseInterface = true;
-                }
             }
         }
 
