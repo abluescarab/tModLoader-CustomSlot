@@ -16,9 +16,9 @@ namespace CustomSlot {
 
         public CroppedTexture2D(Texture2D texture, Rectangle rectangle) : this(texture, Color.White, rectangle) { }
 
-        public CroppedTexture2D(Texture2D texture, Color tint, Rectangle rectangle) {
+        public CroppedTexture2D(Texture2D texture, Color color, Rectangle rectangle) {
             Texture = texture;
-            Color = tint;
+            Color = color;
             Rectangle = rectangle;
         }
 
