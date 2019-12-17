@@ -7,6 +7,7 @@ using Terraria.GameInput;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.UI;
+using Terraria.UI.Chat;
 
 /* TODO: fix number text */
 
@@ -17,6 +18,9 @@ namespace CustomSlot {
             Chest,
             Leg
         }
+
+        public const float DefaultEmptyTextureAlpha = 0.35f;
+        public const float DefaultBackTextureAlpha = 0.8f;
 
         internal const int TickOffsetX = 6;
         internal const int TickOffsetY = 2;
@@ -75,7 +79,7 @@ namespace CustomSlot {
 
             Context = context;
             _scale = scale;
-            _backgroundTexture = new CroppedTexture2D(backgroundTex);
+            _backgroundTexture = new CroppedTexture2D(backgroundTex, Color.White * DefaultBackTextureAlpha);
             EmptyTexture = GetEmptyTexture(context, defaultArmorIcon);
             ItemVisible = true;
             ForceToggleButton = false;
@@ -123,7 +127,7 @@ namespace CustomSlot {
             Rectangle rectangle = GetDimensions().ToRectangle();
             Texture2D itemTexture = EmptyTexture.Texture;
             Rectangle itemRectangle = EmptyTexture.Rectangle;
-            Color color = Color.White * 0.35f;
+            Color color = EmptyTexture.Color;
 
             if(Item.stack > 0) {
                 itemTexture = Main.itemTexture[Item.type];
@@ -132,28 +136,46 @@ namespace CustomSlot {
                 color = Color.White;
             }
 
-            spriteBatch.Draw(
-                BackgroundTexture.Texture,
-                rectangle.TopLeft(),
-                BackgroundTexture.Rectangle,
-                Color.White * 0.8f,
-                0f,
-                Vector2.Zero,
-                Scale,
-                SpriteEffects.None,
-                1f);
+            if(BackgroundTexture.Texture != null) {
+                spriteBatch.Draw(
+                    BackgroundTexture.Texture,
+                    rectangle.TopLeft(),
+                    BackgroundTexture.Rectangle,
+                    BackgroundTexture.Color,
+                    0f,
+                    Vector2.Zero,
+                    Scale,
+                    SpriteEffects.None,
+                    1f);
+            }
 
-            spriteBatch.Draw(
-                itemTexture,
-                rectangle.Center(),
-                itemRectangle,
-                color,
-                0f,
-                new Vector2(itemRectangle.Center.X - itemRectangle.Location.X,
-                            itemRectangle.Center.Y - itemRectangle.Location.Y),
-                Scale,
-                SpriteEffects.None,
-                0f);
+            if(itemTexture != null) {
+                spriteBatch.Draw(
+                    itemTexture,
+                    rectangle.Center(),
+                    itemRectangle,
+                    color,
+                    0f,
+                    new Vector2(itemRectangle.Center.X - itemRectangle.Location.X,
+                                itemRectangle.Center.Y - itemRectangle.Location.Y),
+                    Scale,
+                    SpriteEffects.None,
+                    0f);
+            }
+
+            if(Item.stack > 1) {
+                ChatManager.DrawColorCodedStringWithShadow(
+                    spriteBatch, 
+                    Main.fontItemStack, 
+                    Item.stack.ToString(),
+                    GetDimensions().Position() + new Vector2(10f, 26f) * Scale,
+                    color, 
+                    0f, 
+                    Vector2.Zero, 
+                    new Vector2(Scale), 
+                    -1f, 
+                    Scale);
+            }
         }
 
         /// <summary>
