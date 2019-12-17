@@ -9,8 +9,6 @@ using Terraria.Localization;
 using Terraria.UI;
 using Terraria.UI.Chat;
 
-/* TODO: fix number text */
-
 namespace CustomSlot {
     public class CustomItemSlot : UIElement {
         public enum ArmorType {
@@ -164,17 +162,18 @@ namespace CustomSlot {
                     0f);
             }
 
+            // position based on vanilla code
             if(Item.stack > 1) {
                 ChatManager.DrawColorCodedStringWithShadow(
-                    spriteBatch, 
-                    Main.fontItemStack, 
+                    spriteBatch,
+                    Main.fontItemStack,
                     Item.stack.ToString(),
                     GetDimensions().Position() + new Vector2(10f, 26f) * Scale,
-                    Color.White, 
-                    0f, 
-                    Vector2.Zero, 
-                    new Vector2(Scale), 
-                    -1f, 
+                    Color.White,
+                    0f,
+                    Vector2.Zero,
+                    new Vector2(Scale),
+                    -1f,
                     Scale);
             }
         }
@@ -371,14 +370,14 @@ namespace CustomSlot {
                     break;
             }
 
-            if(frame == -1) return new CroppedTexture2D();
+            if(frame == -1) return CroppedTexture2D.Empty;
 
             Texture2D extraTextures = Main.extraTexture[54];
             Rectangle rectangle = extraTextures.Frame(3, 6, frame % 3, frame / 3);
             rectangle.Width -= 2;
             rectangle.Height -= 2;
 
-            return new CroppedTexture2D(extraTextures, rectangle);
+            return new CroppedTexture2D(extraTextures, DefaultColors.EmptyTexture, rectangle);
         }
 
         /// <summary>
