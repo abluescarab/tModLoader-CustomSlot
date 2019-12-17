@@ -2,15 +2,13 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
+using Terraria.GameContent.Achievements;
 using Terraria.GameInput;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.UI;
 
-/* TODO: fix number text
- * TODO: equip/unequip
- * TODO: partner slot (right-clicking vanity crashes game)
- */
+/* TODO: fix number text */
 
 namespace CustomSlot {
     public class CustomItemSlot : UIElement {
@@ -23,22 +21,18 @@ namespace CustomSlot {
         internal const int TickOffsetX = 6;
         internal const int TickOffsetY = 2;
 
-        private Item _item;
+        public Item Item;
         private CroppedTexture2D _backgroundTexture;
         private float _scale;
         private ToggleVisibilityButton _toggleButton;
         private bool _forceToggleButton;
 
+        public int Context { get; }
         public bool ItemVisible { get; set; }
         public string HoverText { get; set; }
-        public int Context { get; }
         public Func<Item, bool> IsValidItem { get; set; }
         public CroppedTexture2D EmptyTexture { get; set; }
-
-        public Item Item {
-            get => _item;
-            set => _item = value;
-        }
+        public CustomItemSlot Partner { get; set; }
 
         public float Scale {
             get => _scale;
@@ -92,43 +86,6 @@ namespace CustomSlot {
             CalculateSize();
         }
 
-        internal class ToggleVisibilityButton : UIElement {
-            internal ToggleVisibilityButton() {
-                Width.Set(Main.inventoryTickOnTexture.Width, 0f);
-                Height.Set(Main.inventoryTickOnTexture.Height, 0f);
-            }
-
-            protected override void DrawSelf(SpriteBatch spriteBatch) {
-                if(!(Parent is CustomItemSlot slot)) return;
-
-                DoDraw(spriteBatch, slot);
-
-                if(ContainsPoint(Main.MouseScreen) && !PlayerInput.IgnoreMouseInterface) {
-                    Main.LocalPlayer.mouseInterface = true;
-                    Main.hoverItemName = Language.GetTextValue(slot.ItemVisible ? "LegacyInterface.59" : "LegacyInterface.60");
-
-                    if(Main.mouseLeftRelease && Main.mouseLeft) {
-                        Main.PlaySound(SoundID.MenuTick);
-                        slot.ItemVisible = !slot.ItemVisible;
-                    }
-                }
-            }
-
-            private void DoDraw(SpriteBatch spriteBatch, CustomItemSlot slot) {
-                Rectangle parentRectangle = Parent.GetDimensions().ToRectangle();
-                Texture2D tickTexture =
-                    slot.ItemVisible ? Main.inventoryTickOnTexture : Main.inventoryTickOffTexture;
-
-                Left.Set(parentRectangle.Width - Width.Pixels + TickOffsetX, 0f);
-                Top.Set(-TickOffsetY, 0f);
-
-                spriteBatch.Draw(
-                    tickTexture,
-                    GetDimensions().Position(),
-                    Color.White * 0.7f);
-            }
-        }
-
         protected override void DrawSelf(SpriteBatch spriteBatch) {
             DoDraw(spriteBatch);
 
@@ -137,8 +94,23 @@ namespace CustomSlot {
 
                 if(_toggleButton != null && _toggleButton.ContainsPoint(Main.MouseScreen)) return;
 
-                if(IsValidItem == null || Main.mouseItem.stack == 0 || IsValidItem(Main.mouseItem)) {
-                    ItemSlot.Handle(ref _item, Context);
+                if(Main.mouseItem.IsAir || IsValidItem == null || IsValidItem(Main.mouseItem)) {
+                    int tempContext = Context;
+
+                    // fix if it's a vanity slot with no partner
+                    if(Main.mouseRightRelease && Main.mouseRight) {
+                        if(Context == ItemSlot.Context.EquipArmorVanity)
+                            tempContext = ItemSlot.Context.EquipArmor;
+                        else if(Context == ItemSlot.Context.EquipAccessoryVanity)
+                            tempContext = ItemSlot.Context.EquipAccessory;
+                    }
+
+                    if(Partner != null && Main.mouseRightRelease && Main.mouseRight) {
+                        SwapWithPartner();
+                    }
+                    else {
+                        ItemSlot.Handle(ref Item, tempContext);
+                    }
 
                     if(!string.IsNullOrEmpty(HoverText)) {
                         Main.hoverItemName = HoverText;
@@ -185,6 +157,27 @@ namespace CustomSlot {
         }
 
         /// <summary>
+        /// Swap the current item with its partner slot.
+        /// </summary>
+        private void SwapWithPartner() {
+            // modified from vanilla code
+            Utils.Swap(ref Item, ref Partner.Item);
+            Main.PlaySound(SoundID.Grab);
+            Recipe.FindRecipes();
+
+            if(Item.stack <= 0) return;
+
+            if(Context != 0) {
+                if(Context - 8 <= 4 || Context - 16 <= 1) {
+                    AchievementsHelper.HandleOnEquip(Main.LocalPlayer, Item, Context);
+                }
+            }
+            else {
+                AchievementsHelper.NotifyItemPickup(Main.LocalPlayer, Item);
+            }
+        }
+
+        /// <summary>
         /// Calculate the size of the slot based on background texture and scale.
         /// </summary>
         internal void CalculateSize() {
@@ -195,6 +188,43 @@ namespace CustomSlot {
 
             Width.Set(width, 0f);
             Height.Set(height, 0f);
+        }
+
+        internal class ToggleVisibilityButton : UIElement {
+            internal ToggleVisibilityButton() {
+                Width.Set(Main.inventoryTickOnTexture.Width, 0f);
+                Height.Set(Main.inventoryTickOnTexture.Height, 0f);
+            }
+
+            protected override void DrawSelf(SpriteBatch spriteBatch) {
+                if(!(Parent is CustomItemSlot slot)) return;
+
+                DoDraw(spriteBatch, slot);
+
+                if(ContainsPoint(Main.MouseScreen) && !PlayerInput.IgnoreMouseInterface) {
+                    Main.LocalPlayer.mouseInterface = true;
+                    Main.hoverItemName = Language.GetTextValue(slot.ItemVisible ? "LegacyInterface.59" : "LegacyInterface.60");
+
+                    if(Main.mouseLeftRelease && Main.mouseLeft) {
+                        Main.PlaySound(SoundID.MenuTick);
+                        slot.ItemVisible = !slot.ItemVisible;
+                    }
+                }
+            }
+
+            private void DoDraw(SpriteBatch spriteBatch, CustomItemSlot slot) {
+                Rectangle parentRectangle = Parent.GetDimensions().ToRectangle();
+                Texture2D tickTexture =
+                    slot.ItemVisible ? Main.inventoryTickOnTexture : Main.inventoryTickOffTexture;
+
+                Left.Set(parentRectangle.Width - Width.Pixels + TickOffsetX, 0f);
+                Top.Set(-TickOffsetY, 0f);
+
+                spriteBatch.Draw(
+                    tickTexture,
+                    GetDimensions().Position(),
+                    Color.White * 0.7f);
+            }
         }
 
         /// <summary>
