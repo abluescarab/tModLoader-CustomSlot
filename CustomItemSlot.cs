@@ -19,8 +19,11 @@ namespace CustomSlot {
             Leg
         }
 
-        public const float DefaultEmptyTextureAlpha = 0.35f;
-        public const float DefaultBackTextureAlpha = 0.8f;
+        public static class DefaultColors {
+            public static readonly Color EmptyTexture = Color.White * 0.35f;
+            public static readonly Color InventoryItemBack = Main.inventoryBack;
+            public static readonly Color EquipBack = Color.White * 0.8f;
+        }
 
         internal const int TickOffsetX = 6;
         internal const int TickOffsetY = 2;
@@ -75,11 +78,9 @@ namespace CustomSlot {
 
         public CustomItemSlot(int context = ItemSlot.Context.InventoryItem, float scale = 1f,
             ArmorType defaultArmorIcon = ArmorType.Head) {
-            Texture2D backgroundTex = GetBackgroundTexture(context);
-
             Context = context;
             _scale = scale;
-            _backgroundTexture = new CroppedTexture2D(backgroundTex, Color.White * DefaultBackTextureAlpha);
+            _backgroundTexture = GetBackgroundTexture(context);
             EmptyTexture = GetEmptyTexture(context, defaultArmorIcon);
             ItemVisible = true;
             ForceToggleButton = false;
@@ -169,7 +170,7 @@ namespace CustomSlot {
                     Main.fontItemStack, 
                     Item.stack.ToString(),
                     GetDimensions().Position() + new Vector2(10f, 26f) * Scale,
-                    color, 
+                    Color.White, 
                     0f, 
                     Vector2.Zero, 
                     new Vector2(Scale), 
@@ -254,7 +255,10 @@ namespace CustomSlot {
         /// </summary>
         /// <param name="context">slot context</param>
         /// <returns>background texture of the slot</returns>
-        public static Texture2D GetBackgroundTexture(int context) {
+        public static CroppedTexture2D GetBackgroundTexture(int context) {
+            Texture2D texture;
+            Color color = Main.inventoryBack;
+
             switch(context) {
                 case ItemSlot.Context.EquipAccessory:
                 case ItemSlot.Context.EquipArmor:
@@ -263,27 +267,46 @@ namespace CustomSlot {
                 case ItemSlot.Context.EquipMinecart:
                 case ItemSlot.Context.EquipPet:
                 case ItemSlot.Context.EquipLight:
-                    return Main.inventoryBack3Texture;
+                    color = DefaultColors.EquipBack;
+                    texture = Main.inventoryBack3Texture;
+                    break;
                 case ItemSlot.Context.EquipArmorVanity:
                 case ItemSlot.Context.EquipAccessoryVanity:
-                    return Main.inventoryBack8Texture;
+                    color = DefaultColors.EquipBack;
+                    texture = Main.inventoryBack8Texture;
+                    break;
                 case ItemSlot.Context.EquipDye:
-                    return Main.inventoryBack12Texture;
+                    color = DefaultColors.EquipBack;
+                    texture = Main.inventoryBack12Texture;
+                    break;
                 case ItemSlot.Context.ChestItem:
-                    return Main.inventoryBack5Texture;
+                    color = DefaultColors.InventoryItemBack;
+                    texture = Main.inventoryBack5Texture;
+                    break;
                 case ItemSlot.Context.BankItem:
-                    return Main.inventoryBack2Texture;
+                    color = DefaultColors.InventoryItemBack;
+                    texture = Main.inventoryBack2Texture;
+                    break;
                 case ItemSlot.Context.GuideItem:
                 case ItemSlot.Context.PrefixItem:
                 case ItemSlot.Context.CraftingMaterial:
-                    return Main.inventoryBack4Texture;
+                    color = DefaultColors.InventoryItemBack;
+                    texture = Main.inventoryBack4Texture;
+                    break;
                 case ItemSlot.Context.TrashItem:
-                    return Main.inventoryBack7Texture;
+                    color = DefaultColors.InventoryItemBack;
+                    texture = Main.inventoryBack7Texture;
+                    break;
                 case ItemSlot.Context.ShopItem:
-                    return Main.inventoryBack6Texture;
+                    color = DefaultColors.InventoryItemBack;
+                    texture = Main.inventoryBack6Texture;
+                    break;
                 default:
-                    return Main.inventoryBackTexture;
+                    texture = Main.inventoryBackTexture;
+                    break;
             }
+
+            return new CroppedTexture2D(texture, color);
         }
 
         /// <summary>
