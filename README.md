@@ -1,0 +1,1 @@
+﻿This repository contains a collection of files you can use to create your own custom slot in tModLoader. *This project is a work in progress.*
