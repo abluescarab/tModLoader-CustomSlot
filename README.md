@@ -3,7 +3,7 @@
 **This project is a work in progress** and reuses a lot of vanilla code. If you want to help, read Terraria's source code in [ILSpy](https://github.com/icsharpcode/ILSpy) or another decompiler and make a pull request.
 
 ## How to use these files
-To add the files to your project, you can either [download this repository](https://github.com/abluescarab/tModLoader-CustomSlot/archive/master.zip) or add it as a submodule in Git using a GUI or the command line.
+To add the files to your project, you can either [download this repository](https://github.com/abluescarab/tModLoader-CustomSlot/archive/master.zip) or add it as a submodule in Git using a GUI or the command line. To clone the repository into a subfolder named `CustomSlot`:
 ```
 git submodule add https://github.com/abluescarab/tModLoader-CustomSlot.git CustomSlot
 ```
