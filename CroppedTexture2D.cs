@@ -23,17 +23,22 @@ namespace CustomSlot {
         }
 
         public static bool operator ==(CroppedTexture2D ct1, CroppedTexture2D ct2) {
-            return ct1.Texture == ct2.Texture && ct1.Rectangle == ct2.Rectangle;
+            return ct1.Texture == ct2.Texture &&
+                   ct1.Rectangle == ct2.Rectangle &&
+                   ct1.Color == ct2.Color;
         }
 
         public static bool operator !=(CroppedTexture2D ct1, CroppedTexture2D ct2) {
-            return ct1.Texture != ct2.Texture || ct1.Rectangle != ct2.Rectangle;
+            return ct1.Texture != ct2.Texture || 
+                   ct1.Rectangle != ct2.Rectangle ||
+                   ct1.Color != ct2.Color;
         }
 
         public override bool Equals(object obj) {
-            return obj is CroppedTexture2D d &&
-                   EqualityComparer<Texture2D>.Default.Equals(Texture, d.Texture) &&
-                   Rectangle.Equals(d.Rectangle);
+            return obj is CroppedTexture2D ct &&
+                   EqualityComparer<Texture2D>.Default.Equals(Texture, ct.Texture) &&
+                   Rectangle.Equals(ct.Rectangle) &&
+                   Color.Equals(ct.Color);
         }
 
         public override int GetHashCode() {
