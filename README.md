@@ -16,3 +16,6 @@ git commit
 
 ## Reporting bugs and making suggestions
 Please use GitHub's [issues section](https://github.com/abluescarab/tModLoader-CustomSlot/issues) on this repository to report bugs, make suggestions, or request new features.
+
+## Known issues
+* Items with multiple colors display as gray
