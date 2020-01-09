@@ -4,8 +4,8 @@
 
 ## Contents
 1. [How to use these files](#how-to-use-these-files)
-    1. [Slot properties](#slot-properties)
-    2. [Creating a custom slot](#creating-a-custom-slot)
+    1. [Creating a custom slot](#creating-a-custom-slot)
+    2. [Slot properties](#slot-properties)
 2. [Reporting bugs and making suggestions](#reporting-bugs-and-making-suggestions)
 3. [Known issues](#known-issues)
 
@@ -21,21 +21,22 @@ git submodule update --remote --merge
 git commit
 ```
 
-### Slot properties
-* `ArmorType` - Used to determine the armor icon when the slot has an armor context and no empty texture.
-* `BackgroundTexture` - The background texture of the slot, typically a square.
-* `Context` - The context of the slot (`ItemSlot.Context`), used to determine default behavior.
-* `DefaultColors` - Use these colors for a `CroppedTexture2D` unless you want to customize the color and opacity.
-* `EmptyTexture` - A texture to draw inside the background when the slot is empty.
-* `ForceToggleButton` - Whether to force a toggle visibility button even if the context isn't for an equipment slot.
-* `HoverText` - The text to display when the mouse is hovered over the empty slot.
-* `IsValidItem` - A function to determine which items can be placed in the slot.
-* `Item` - The item in the slot.
-* `ItemVisible` - Whether the item is visible on the player (usually determined by the toggle visibility button).
-* `Partner` - A slot to swap items with when this one is right-clicked.
-* `Scale` - The current scale of the slot (0.5 is half-size, 1.0 is full-size, 2.0 is double-size, etc.).
-
 ### Creating a custom slot
+A basic inventory slot can be created by creating a new `CustomItemSlot` with no parameters:
+```csharp
+CustomItemSlot mySlot = new CustomItemSlot();
+```
+An item slot can also be created with parameters and an initializer:
+```csharp
+CustomItemSlot mySlot = new CustomItemSlot(ItemSlot.Context.InventoryItem,
+                                           1f, CustomItemSlot.ArmorType.Head) {
+    ItemVisible = true,
+    HoverText = "Item Name",
+    IsValidItem = item => item.type > 0
+};
+```
+Check the [slot properties](#slot-properties) section to see how you can customize the slot's appearance and functionality.
+
 The first step to creating a custom slot is adding a new `UIState`.
 ```csharp
 using Terraria.UI;
@@ -114,6 +115,20 @@ public class MyMod : Mod {
 }
 ```
 Then just customize your item slot and add any additional functionality.
+
+### Slot properties
+* `ArmorType` - Used to determine the armor icon when the slot has an armor context and no empty texture.
+* `BackgroundTexture` - The background texture of the slot, typically a square.
+* `Context` - The context of the slot (`ItemSlot.Context`), used to determine default behavior.
+* `DefaultColors` - Use these colors for a `CroppedTexture2D` unless you want to customize the color and opacity.
+* `EmptyTexture` - A texture to draw inside the background when the slot is empty.
+* `ForceToggleButton` - Whether to force a toggle visibility button even if the context isn't for an equipment slot.
+* `HoverText` - The text to display when the mouse is hovered over the empty slot.
+* `IsValidItem` - A function to determine which items can be placed in the slot.
+* `Item` - The item in the slot.
+* `ItemVisible` - Whether the item is visible on the player (usually determined by the toggle visibility button).
+* `Partner` - A slot to swap items with when this one is right-clicked.
+* `Scale` - The current scale of the slot (0.5 is half-size, 1.0 is full-size, 2.0 is double-size, etc.).
 
 ## Reporting bugs and making suggestions
 Please use GitHub's [issues section](https://github.com/abluescarab/tModLoader-CustomSlot/issues) on this repository to report bugs, make suggestions, or request new features.
