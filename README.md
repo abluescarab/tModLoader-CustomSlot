@@ -134,4 +134,4 @@ Then just customize your item slot and add any additional functionality.
 Please use GitHub's [issues section](https://github.com/abluescarab/tModLoader-CustomSlot/issues) on this repository to report bugs, make suggestions, or request new features.
 
 ## Known issues
-None at the moment.
+* Right-clicking empty accessory slots makes a sound
