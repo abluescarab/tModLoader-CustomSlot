@@ -133,6 +133,8 @@ namespace CustomSlot {
                 itemRectangle = Main.itemAnimations[Item.type] != null ?
                     Main.itemAnimations[Item.type].GetFrame(itemTexture) : itemTexture.Frame();
                 color = Color.White;
+
+                ItemSlot.GetItemLight(ref color, Item);
             }
 
             if(BackgroundTexture.Texture != null) {
@@ -153,7 +155,7 @@ namespace CustomSlot {
                     itemTexture,
                     rectangle.Center(),
                     itemRectangle,
-                    color,
+                    Item.color == Color.Transparent ? Item.GetAlpha(color) : Item.GetColor(color),
                     0f,
                     new Vector2(itemRectangle.Center.X - itemRectangle.Location.X,
                                 itemRectangle.Center.Y - itemRectangle.Location.Y),
