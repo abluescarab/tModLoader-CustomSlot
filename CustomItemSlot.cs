@@ -127,6 +127,7 @@ namespace CustomSlot {
             Texture2D itemTexture = EmptyTexture.Texture;
             Rectangle itemRectangle = EmptyTexture.Rectangle;
             Color color = EmptyTexture.Color;
+            float itemLightScale = 1f;
 
             if(Item.stack > 0) {
                 itemTexture = Main.itemTexture[Item.type];
@@ -134,7 +135,7 @@ namespace CustomSlot {
                     Main.itemAnimations[Item.type].GetFrame(itemTexture) : itemTexture.Frame();
                 color = Color.White;
 
-                ItemSlot.GetItemLight(ref color, Item);
+                ItemSlot.GetItemLight(ref color, ref itemLightScale, Item);
             }
 
             if(BackgroundTexture.Texture != null) {
@@ -151,6 +152,19 @@ namespace CustomSlot {
             }
 
             if(itemTexture != null) {
+                // copied from ItemSlot.Draw()
+                float oversizedScale = 1f;
+                if(itemRectangle.Width > 32 || itemRectangle.Height > 32) {
+                    if(itemRectangle.Width > itemRectangle.Height) {
+                        oversizedScale = 32f / itemRectangle.Width;
+                    }
+                    else {
+                        oversizedScale = 32f / itemRectangle.Height;
+                    }
+                }
+
+                oversizedScale *= Scale;
+
                 spriteBatch.Draw(
                     itemTexture,
                     rectangle.Center(),
@@ -159,7 +173,7 @@ namespace CustomSlot {
                     0f,
                     new Vector2(itemRectangle.Center.X - itemRectangle.Location.X,
                                 itemRectangle.Center.Y - itemRectangle.Location.Y),
-                    Scale,
+                    oversizedScale * itemLightScale,
                     SpriteEffects.None,
                     0f);
             }
