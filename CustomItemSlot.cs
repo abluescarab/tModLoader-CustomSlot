@@ -26,11 +26,14 @@ namespace CustomSlot {
         internal const int TickOffsetX = 6;
         internal const int TickOffsetY = 2;
 
-        public Item Item;
         private CroppedTexture2D _backgroundTexture;
         private float _scale;
         private ToggleVisibilityButton _toggleButton;
         private bool _forceToggleButton;
+
+        public Item Item;
+        public event EventHandler<ItemPlacedEventArgs> ItemPlaced;
+        public event EventHandler<ItemVisibilityChangedEventArgs> ItemVisibilityChanged;
 
         public int Context { get; }
         public bool ItemVisible { get; set; }
@@ -118,6 +121,8 @@ namespace CustomSlot {
                     if(!string.IsNullOrEmpty(HoverText)) {
                         Main.hoverItemName = HoverText;
                     }
+
+                    ItemPlaced?.Invoke(this, new ItemPlacedEventArgs(Item));
                 }
             }
         }
@@ -246,6 +251,7 @@ namespace CustomSlot {
                     if(Main.mouseLeftRelease && Main.mouseLeft) {
                         Main.PlaySound(SoundID.MenuTick);
                         slot.ItemVisible = !slot.ItemVisible;
+                        slot.ItemVisibilityChanged?.Invoke(this, new ItemVisibilityChangedEventArgs(slot.ItemVisible));
                     }
                 }
             }
