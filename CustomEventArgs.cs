@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 using Terraria;
 
 namespace CustomSlot {
-    public class ItemPlacedEventArgs : EventArgs {
+    public class ItemChangedEventArgs : EventArgs {
         public readonly Item Item;
 
-        public ItemPlacedEventArgs(Item item) {
+        public ItemChangedEventArgs(Item item) {
             Item = item;
         }
     }

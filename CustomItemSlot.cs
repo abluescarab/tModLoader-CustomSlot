@@ -26,13 +26,12 @@ namespace CustomSlot {
         internal const int TickOffsetX = 6;
         internal const int TickOffsetY = 2;
 
+        private Item item;
         private CroppedTexture2D backgroundTexture;
         private float scale;
         private ToggleVisibilityButton toggleButton;
         private bool forceToggleButton;
-
-        public Item Item;
-        public event EventHandler<ItemPlacedEventArgs> ItemPlaced;
+        public event EventHandler<ItemChangedEventArgs> ItemChanged;
         public event EventHandler<ItemVisibilityChangedEventArgs> ItemVisibilityChanged;
 
         public int Context { get; }
@@ -41,6 +40,8 @@ namespace CustomSlot {
         public Func<Item, bool> IsValidItem { get; set; }
         public CroppedTexture2D EmptyTexture { get; set; }
         public CustomItemSlot Partner { get; set; }
+
+        public Item Item => item;
 
         public float Scale {
             get => scale;
@@ -86,8 +87,8 @@ namespace CustomSlot {
             ItemVisible = true;
             ForceToggleButton = false;
 
-            Item = new Item();
-            Item.SetDefaults();
+            item = new Item();
+            item.SetDefaults();
 
             CalculateSize();
         }
@@ -102,6 +103,7 @@ namespace CustomSlot {
 
                 if(Main.mouseItem.IsAir || IsValidItem == null || IsValidItem(Main.mouseItem)) {
                     int tempContext = Context;
+                    Item tempItem = Item.Clone();
 
                     // fix if it's a vanity slot with no partner
                     if(Main.mouseRightRelease && Main.mouseRight) {
@@ -113,18 +115,32 @@ namespace CustomSlot {
 
                     if(Partner != null && Main.mouseRightRelease && Main.mouseRight) {
                         SwapWithPartner();
+                        ItemChanged?.Invoke(this, new ItemChangedEventArgs(Item));
                     }
                     else {
-                        ItemSlot.Handle(ref Item, tempContext);
+                        ItemSlot.Handle(ref item, tempContext);
+
+                        if(!tempItem.IsTheSameAs(Item))
+                            ItemChanged?.Invoke(this, new ItemChangedEventArgs(Item));
                     }
 
                     if(!string.IsNullOrEmpty(HoverText)) {
                         Main.hoverItemName = HoverText;
                     }
-
-                    ItemPlaced?.Invoke(this, new ItemPlacedEventArgs(Item));
                 }
             }
+        }
+
+        /// <summary>
+        /// Set the item in the slot.
+        /// </summary>
+        /// <param name="newItem">item to put in the slot</param>
+        /// <param name="fireItemChangedEvent">whether to fire the <see cref="ItemChanged"/> event</param>
+        public void SetItem(Item newItem, bool fireItemChangedEvent = true) {
+            item = newItem.Clone();
+
+            if(fireItemChangedEvent)
+                ItemChanged?.Invoke(this, new ItemChangedEventArgs(newItem));
         }
 
         private void DoDraw(SpriteBatch spriteBatch) {
@@ -204,7 +220,7 @@ namespace CustomSlot {
         /// </summary>
         private void SwapWithPartner() {
             // modified from vanilla code
-            Utils.Swap(ref Item, ref Partner.Item);
+            Utils.Swap(ref item, ref Partner.item);
             Main.PlaySound(SoundID.Grab);
             Recipe.FindRecipes();
 
