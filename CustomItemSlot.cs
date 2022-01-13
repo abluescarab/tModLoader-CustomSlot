@@ -26,10 +26,10 @@ namespace CustomSlot {
         internal const int TickOffsetX = 6;
         internal const int TickOffsetY = 2;
 
-        private CroppedTexture2D _backgroundTexture;
-        private float _scale;
-        private ToggleVisibilityButton _toggleButton;
-        private bool _forceToggleButton;
+        private CroppedTexture2D backgroundTexture;
+        private float scale;
+        private ToggleVisibilityButton toggleButton;
+        private bool forceToggleButton;
 
         public Item Item;
         public event EventHandler<ItemPlacedEventArgs> ItemPlaced;
@@ -43,36 +43,36 @@ namespace CustomSlot {
         public CustomItemSlot Partner { get; set; }
 
         public float Scale {
-            get => _scale;
+            get => scale;
             set {
-                _scale = value;
+                scale = value;
                 CalculateSize();
             }
         }
 
         public CroppedTexture2D BackgroundTexture {
-            get => _backgroundTexture;
+            get => backgroundTexture;
             set {
-                _backgroundTexture = value;
+                backgroundTexture = value;
                 CalculateSize();
             }
         }
 
         public bool ForceToggleButton {
-            get => _forceToggleButton;
+            get => forceToggleButton;
             set {
-                _forceToggleButton = value;
-                bool hasButton = _forceToggleButton || HasToggleButton(Context);
+                forceToggleButton = value;
+                bool hasButton = forceToggleButton || HasToggleButton(Context);
 
                 if(!hasButton) {
-                    if(_toggleButton == null) return;
+                    if(toggleButton == null) return;
 
-                    RemoveChild(_toggleButton);
-                    _toggleButton = null;
+                    RemoveChild(toggleButton);
+                    toggleButton = null;
                 }
                 else {
-                    _toggleButton = new ToggleVisibilityButton();
-                    Append(_toggleButton);
+                    toggleButton = new ToggleVisibilityButton();
+                    Append(toggleButton);
                 }
             }
         }
@@ -80,8 +80,8 @@ namespace CustomSlot {
         public CustomItemSlot(int context = ItemSlot.Context.InventoryItem, float scale = 1f,
             ArmorType defaultArmorIcon = ArmorType.Head) {
             Context = context;
-            _scale = scale;
-            _backgroundTexture = GetBackgroundTexture(context);
+            this.scale = scale;
+            backgroundTexture = GetBackgroundTexture(context);
             EmptyTexture = GetEmptyTexture(context, defaultArmorIcon);
             ItemVisible = true;
             ForceToggleButton = false;
@@ -98,7 +98,7 @@ namespace CustomSlot {
             if(ContainsPoint(Main.MouseScreen) && !PlayerInput.IgnoreMouseInterface) {
                 Main.LocalPlayer.mouseInterface = true;
 
-                if(_toggleButton != null && _toggleButton.ContainsPoint(Main.MouseScreen)) return;
+                if(toggleButton != null && toggleButton.ContainsPoint(Main.MouseScreen)) return;
 
                 if(Main.mouseItem.IsAir || IsValidItem == null || IsValidItem(Main.mouseItem)) {
                     int tempContext = Context;
