@@ -6,6 +6,7 @@
 1. [How to use these files](#how-to-use-these-files)
     1. [Creating a custom slot](#creating-a-custom-slot)
     2. [Slot properties](#slot-properties)
+    3. [Slot events](#slot-events)
 2. [Reporting bugs and making suggestions](#reporting-bugs-and-making-suggestions)
 3. [Known issues](#known-issues)
 
