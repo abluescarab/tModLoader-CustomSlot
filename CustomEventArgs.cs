@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Terraria;
 
-namespace WingSlot.CustomSlot {
+namespace CustomSlot {
     public class ItemPlacedEventArgs : EventArgs {
         public readonly Item Item;
 
