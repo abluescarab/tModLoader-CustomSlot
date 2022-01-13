@@ -130,6 +130,10 @@ Then just customize your item slot and add any additional functionality.
 * `Partner` - A slot to swap items with when this one is right-clicked.
 * `Scale` - The current scale of the slot (0.5 is half-size, 1.0 is full-size, 2.0 is double-size, etc.).
 
+### Slot events
+* `ItemPlaced(object sender, ItemPlacedEventArgs e)` - Fires when a valid item is placed in the slot.
+* `ItemVisibilityChanged(object sender, ItemVisibilityChangedEventArgs e)` - Fires when item visibility is changed (eye icon on a slot is clicked).
+
 ## Reporting bugs and making suggestions
 Please use GitHub's [issues section](https://github.com/abluescarab/tModLoader-CustomSlot/issues) on this repository to report bugs, make suggestions, or request new features.
 
