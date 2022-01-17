@@ -54,15 +54,10 @@ namespace CustomSlot.UI {
         /// <summary>
         /// Whether the UI is visible or not.
         /// </summary>
-        public virtual bool IsVisible {
-            get {
-                bool nextToUniques = PanelLocation == Location.Uniques;
-
-                return Main.playerInventory &&
-                       (nextToUniques && Main.EquipPage == 2 || 
-                        !nextToUniques && Main.EquipPage != 2);
-            }
-        }
+        public virtual bool IsVisible => Main.playerInventory &&
+                                         (PanelLocation == Location.Accessories && Main.EquipPage != 2 ||
+                                          PanelLocation == Location.Uniques && Main.EquipPage == 2 ||
+                                          PanelLocation == Location.Custom);
 
         public override void OnInitialize() {
             EquipSlot = new CustomItemSlot(ItemSlot.Context.EquipAccessory, 0.85f);
@@ -80,7 +75,7 @@ namespace CustomSlot.UI {
             if(PanelLocation == Location.Custom)
                 MoveToCustomPosition();
             else
-                SetPosition();
+                ResetPosition();
 
             SocialSlot.Left.Set(slotSize + HorizontalSlotMargin, 0);
             EquipSlot.Left.Set((slotSize * 2) + (HorizontalSlotMargin * 2), 0);
@@ -98,14 +93,14 @@ namespace CustomSlot.UI {
                 return;
             }
 
-            SetPosition();
+            ResetPosition();
         }
 
         public virtual void MoveToCustomPosition() {
             Panel.Left.Set(PanelCoordinates.X, 0);
             Panel.Top.Set(PanelCoordinates.Y, 0);
         }
-
+        
         protected virtual Vector2 CalculatePosition() {
             int slotSize = (int)EquipSlot.Width.Pixels;
             int mapH = 0;
@@ -164,7 +159,7 @@ namespace CustomSlot.UI {
             return new Vector2(rX, rY);
         }
 
-        protected virtual void SetPosition() {
+        public virtual void ResetPosition() {
             Vector2 pos = CalculatePosition();
 
             Panel.Left.Set(pos.X - Panel.PaddingLeft - ((EquipSlot.Width.Pixels + HorizontalSlotMargin) * 2), 0);
