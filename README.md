@@ -2,6 +2,8 @@
 
 **This project is a work in progress** and reuses a lot of vanilla code. If you want to help, read Terraria's source code in [ILSpy](https://github.com/icsharpcode/ILSpy) or another decompiler and make a pull request.
 
+*This project is under the [GNU General Public License v3.0.](LICENSE)*
+
 ## Contents
 1. [How to use these files](#how-to-use-these-files)
     1. [Creating a custom slot](#creating-a-custom-slot)
@@ -38,7 +40,7 @@ CustomItemSlot mySlot = new CustomItemSlot(ItemSlot.Context.InventoryItem,
 ```
 Check the [slot properties](#slot-properties) section to see how you can customize the slot's appearance and functionality.
 
-The first step to creating a custom slot is adding a new `UIState`.
+The first step to creating a custom slot is adding a new `UIState`, or you can derive one from [`AccessorySlotsUI`](UI/AccessorySlotsUI.cs) if you want custom accessory slots.
 ```csharp
 using Terraria.UI;
 
