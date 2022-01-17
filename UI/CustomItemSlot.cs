@@ -9,7 +9,7 @@ using Terraria.Localization;
 using Terraria.UI;
 using Terraria.UI.Chat;
 
-namespace CustomSlot {
+namespace CustomSlot.UI {
     public class CustomItemSlot : UIElement {
         public enum ArmorType {
             Head,
