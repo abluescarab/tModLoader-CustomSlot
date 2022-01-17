@@ -32,7 +32,7 @@ namespace CustomSlot.UI {
 
             if(!CanDrag) return;
 
-            if(ContainsPoint(evt.MousePosition) && 
+            if(ContainsPoint(evt.MousePosition) &&
                !GetInnerDimensions().ToRectangle().Contains(evt.MousePosition.ToPoint())) {
                 DragBegin(evt);
             }

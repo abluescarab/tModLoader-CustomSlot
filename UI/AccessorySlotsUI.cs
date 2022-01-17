@@ -100,7 +100,7 @@ namespace CustomSlot.UI {
             Panel.Left.Set(PanelCoordinates.X, 0);
             Panel.Top.Set(PanelCoordinates.Y, 0);
         }
-        
+
         protected virtual Vector2 CalculatePosition() {
             int slotSize = (int)EquipSlot.Width.Pixels;
             int mapH = 0;

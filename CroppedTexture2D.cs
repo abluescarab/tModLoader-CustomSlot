@@ -29,7 +29,7 @@ namespace CustomSlot {
         }
 
         public static bool operator !=(CroppedTexture2D ct1, CroppedTexture2D ct2) {
-            return ct1.Texture != ct2.Texture || 
+            return ct1.Texture != ct2.Texture ||
                    ct1.Rectangle != ct2.Rectangle ||
                    ct1.Color != ct2.Color;
         }
