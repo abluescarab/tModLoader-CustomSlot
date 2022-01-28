@@ -1,7 +1,11 @@
 ﻿using System;
+using CustomSlot.UI;
 using Terraria;
 
 namespace CustomSlot {
+    public delegate void ItemChangedEventHandler(CustomItemSlot slot, ItemChangedEventArgs e);
+    public delegate void ItemVisiblityChangedEventHandler(CustomItemSlot slot, ItemVisibilityChangedEventArgs e);
+
     public class ItemChangedEventArgs : EventArgs {
         public readonly Item OldItem;
         public readonly Item NewItem;

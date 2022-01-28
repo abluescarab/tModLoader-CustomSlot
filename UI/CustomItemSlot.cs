@@ -25,14 +25,14 @@ namespace CustomSlot.UI {
 
         internal const int TickOffsetX = 6;
         internal const int TickOffsetY = 2;
-
+        
         protected Item item;
         protected CroppedTexture2D backgroundTexture;
         protected float scale;
         protected ToggleVisibilityButton toggleButton;
         protected bool forceToggleButton;
-        public event EventHandler<ItemChangedEventArgs> ItemChanged;
-        public event EventHandler<ItemVisibilityChangedEventArgs> ItemVisibilityChanged;
+        public event ItemChangedEventHandler ItemChanged;
+        public event ItemVisiblityChangedEventHandler ItemVisibilityChanged;
 
         /// <summary>
         /// The slot context from <see cref="ItemSlot.Context"/>.
@@ -294,7 +294,7 @@ namespace CustomSlot.UI {
                     if(Main.mouseLeftRelease && Main.mouseLeft) {
                         Main.PlaySound(SoundID.MenuTick);
                         slot.ItemVisible = !slot.ItemVisible;
-                        slot.ItemVisibilityChanged?.Invoke(this, new ItemVisibilityChangedEventArgs(slot.ItemVisible));
+                        slot.ItemVisibilityChanged?.Invoke(slot, new ItemVisibilityChangedEventArgs(slot.ItemVisible));
                     }
                 }
             }
