@@ -163,10 +163,11 @@ namespace CustomSlot.UI {
         /// <param name="newItem">item to put in the slot</param>
         /// <param name="fireItemChangedEvent">whether to fire the <see cref="ItemChanged"/> event</param>
         public virtual void SetItem(Item newItem, bool fireItemChangedEvent = true) {
+            Item tempItem = item.Clone();
             item = newItem.Clone();
 
             if(fireItemChangedEvent)
-                ItemChanged?.Invoke(this, new ItemChangedEventArgs(newItem));
+                ItemChanged?.Invoke(this, new ItemChangedEventArgs(tempItem, newItem));
         }
 
         protected void DoDraw(SpriteBatch spriteBatch) {
