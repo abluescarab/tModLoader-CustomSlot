@@ -34,15 +34,37 @@ namespace CustomSlot.UI {
         public event EventHandler<ItemChangedEventArgs> ItemChanged;
         public event EventHandler<ItemVisibilityChangedEventArgs> ItemVisibilityChanged;
 
+        /// <summary>
+        /// The slot context from <see cref="ItemSlot.Context"/>.
+        /// </summary>
         public int Context { get; }
+        /// <summary>
+        /// Whether the item in the slot is visible.
+        /// </summary>
         public bool ItemVisible { get; set; }
+        /// <summary>
+        /// The text to display when the slot is hovered over.
+        /// </summary>
         public string HoverText { get; set; }
+        /// <summary>
+        /// A function to determine whether the mouse item can be placed in the slot.
+        /// </summary>
         public Func<Item, bool> IsValidItem { get; set; }
+        /// <summary>
+        /// The texture to display in the foreground of the slot when it is empty.
+        /// </summary>
         public CroppedTexture2D EmptyTexture { get; set; }
+        /// <summary>
+        /// The slot that the current item will move to when right-clicked.
+        /// </summary>
         public CustomItemSlot Partner { get; set; }
-
+        /// <summary>
+        /// The current item in the slot.
+        /// </summary>
         public Item Item => item;
-
+        /// <summary>
+        /// The scale of the slot.
+        /// </summary>
         public float Scale {
             get => scale;
             set {
@@ -50,7 +72,9 @@ namespace CustomSlot.UI {
                 CalculateSize();
             }
         }
-
+        /// <summary>
+        /// The background texture of the slot.
+        /// </summary>
         public CroppedTexture2D BackgroundTexture {
             get => backgroundTexture;
             set {
@@ -58,7 +82,9 @@ namespace CustomSlot.UI {
                 CalculateSize();
             }
         }
-
+        /// <summary>
+        /// Whether to force a toggle button on the slot if the context does not allow one.
+        /// </summary>
         public bool ForceToggleButton {
             get => forceToggleButton;
             set {
