@@ -16,7 +16,7 @@ namespace CustomSlot.UI {
             Chest,
             Leg
         }
-
+        
         public static class DefaultColors {
             public static readonly Color EmptyTexture = Color.White * 0.35f;
             public static readonly Color InventoryItemBack = Main.inventoryBack;
@@ -26,11 +26,11 @@ namespace CustomSlot.UI {
         internal const int TickOffsetX = 6;
         internal const int TickOffsetY = 2;
 
-        private Item item;
-        private CroppedTexture2D backgroundTexture;
-        private float scale;
-        private ToggleVisibilityButton toggleButton;
-        private bool forceToggleButton;
+        protected Item item;
+        protected CroppedTexture2D backgroundTexture;
+        protected float scale;
+        protected ToggleVisibilityButton toggleButton;
+        protected bool forceToggleButton;
         public event EventHandler<ItemChangedEventArgs> ItemChanged;
         public event EventHandler<ItemVisibilityChangedEventArgs> ItemVisibilityChanged;
 
@@ -136,14 +136,14 @@ namespace CustomSlot.UI {
         /// </summary>
         /// <param name="newItem">item to put in the slot</param>
         /// <param name="fireItemChangedEvent">whether to fire the <see cref="ItemChanged"/> event</param>
-        public void SetItem(Item newItem, bool fireItemChangedEvent = true) {
+        public virtual void SetItem(Item newItem, bool fireItemChangedEvent = true) {
             item = newItem.Clone();
 
             if(fireItemChangedEvent)
                 ItemChanged?.Invoke(this, new ItemChangedEventArgs(newItem));
         }
 
-        private void DoDraw(SpriteBatch spriteBatch) {
+        protected void DoDraw(SpriteBatch spriteBatch) {
             Rectangle rectangle = GetDimensions().ToRectangle();
             Texture2D itemTexture = EmptyTexture.Texture;
             Rectangle itemRectangle = EmptyTexture.Rectangle;
@@ -218,7 +218,7 @@ namespace CustomSlot.UI {
         /// <summary>
         /// Swap the current item with its partner slot.
         /// </summary>
-        private void SwapWithPartner() {
+        protected void SwapWithPartner() {
             // modified from vanilla code
             Utils.Swap(ref item, ref Partner.item);
             Main.PlaySound(SoundID.Grab);
@@ -249,7 +249,7 @@ namespace CustomSlot.UI {
             Height.Set(height, 0f);
         }
 
-        internal class ToggleVisibilityButton : UIElement {
+        protected internal class ToggleVisibilityButton : UIElement {
             internal ToggleVisibilityButton() {
                 Width.Set(Main.inventoryTickOnTexture.Width, 0f);
                 Height.Set(Main.inventoryTickOnTexture.Height, 0f);
@@ -272,7 +272,7 @@ namespace CustomSlot.UI {
                 }
             }
 
-            private void DoDraw(SpriteBatch spriteBatch, CustomItemSlot slot) {
+            protected void DoDraw(SpriteBatch spriteBatch, CustomItemSlot slot) {
                 Rectangle parentRectangle = Parent.GetDimensions().ToRectangle();
                 Texture2D tickTexture =
                     slot.ItemVisible ? Main.inventoryTickOnTexture : Main.inventoryTickOffTexture;
