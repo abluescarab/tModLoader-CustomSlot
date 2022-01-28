@@ -141,13 +141,13 @@ namespace CustomSlot.UI {
 
                     if(Partner != null && Main.mouseRightRelease && Main.mouseRight) {
                         SwapWithPartner();
-                        ItemChanged?.Invoke(this, new ItemChangedEventArgs(Item));
+                        ItemChanged?.Invoke(this, new ItemChangedEventArgs(tempItem, Item));
                     }
                     else {
                         ItemSlot.Handle(ref item, tempContext);
 
                         if(!tempItem.IsTheSameAs(Item))
-                            ItemChanged?.Invoke(this, new ItemChangedEventArgs(Item));
+                            ItemChanged?.Invoke(this, new ItemChangedEventArgs(tempItem, Item));
                     }
 
                     if(!string.IsNullOrEmpty(HoverText)) {

@@ -3,10 +3,12 @@ using Terraria;
 
 namespace CustomSlot {
     public class ItemChangedEventArgs : EventArgs {
-        public readonly Item Item;
+        public readonly Item OldItem;
+        public readonly Item NewItem;
 
-        public ItemChangedEventArgs(Item item) {
-            Item = item;
+        public ItemChangedEventArgs(Item oldItem, Item newItem) {
+            OldItem = oldItem;
+            NewItem = newItem;
         }
     }
 
