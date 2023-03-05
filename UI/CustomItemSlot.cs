@@ -8,6 +8,7 @@ using Terraria.GameContent.Achievements;
 using Terraria.GameInput;
 using Terraria.ID;
 using Terraria.Localization;
+using Terraria.ModLoader;
 using Terraria.UI;
 using Terraria.UI.Chat;
 
@@ -180,7 +181,7 @@ namespace CustomSlot.UI {
             float itemLightScale = 1f;
 
             if(Item.stack > 0) {
-                itemTexture = TextureAssets.Item[Item.type].Value;
+                itemTexture = Main.Assets.Request<Texture2D>(TextureAssets.Item[Item.type].Name).Value;
                 itemRectangle = Main.itemAnimations[Item.type] != null ?
                     Main.itemAnimations[Item.type].GetFrame(itemTexture) : itemTexture.Frame();
                 color = Color.White;
