@@ -1,59 +1,22 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System;
 using Terraria;
-using Terraria.GameContent;
-using Terraria.GameInput;
-using Terraria.ID;
 using Terraria.UI;
 
 namespace CustomSlot.UI {
     public class AccessorySlotsUI : UIState {
-        /// <summary>
-        /// Where to place the slot panel.
-        /// </summary>
-        public enum Location {
-            Accessories,
-            Uniques,
-            Custom
-        }
-
         /// <summary>
         /// The horizontal margin between slots.
         /// Default: 3 (from game source code)
         /// </summary>
         protected int HorizontalSlotMargin = 3;
         /// <summary>
-        /// The number of rows to skip when on the accessories or uniques page.
-        /// </summary>
-        public int RowsToSkip;
-        /// <summary>
         /// The current panel coordinates.
         /// </summary>
-        public Vector2 PanelCoordinates;
-
+        public Vector2 PanelCoordinates => new Vector2(Panel.Left.Pixels, Panel.Top.Pixels);
         /// <summary>
         /// The default location of the panel.
         /// </summary>
-        public Vector2 DefaultCoordinates {
-            get => GetDefaultPosition();
-        }
-        /// <summary>
-        /// The slot holding the equipped item.
-        /// </summary>
-        public CustomItemSlot EquipSlot { get; protected set; }
-        /// <summary>
-        /// The slot holding the social (vanity) item.
-        /// </summary>
-        public CustomItemSlot SocialSlot { get; protected set; }
-        /// <summary>
-        /// The slot holding the dye.
-        /// </summary>
-        public CustomItemSlot DyeSlot { get; protected set; }
-        /// <summary>
-        /// Where to place the slot panel.
-        /// </summary>
-        public Location PanelLocation { get; set; }
+        public Vector2 DefaultCoordinates => GetDefaultPosition();
         /// <summary>
         /// The panel holding the item slots.
         /// </summary>
@@ -61,113 +24,20 @@ namespace CustomSlot.UI {
         /// <summary>
         /// Whether the UI is visible or not.
         /// </summary>
-        public virtual bool IsVisible => Main.playerInventory &&
-                                         (PanelLocation == Location.Accessories && Main.EquipPage != 2 ||
-                                          PanelLocation == Location.Uniques && Main.EquipPage == 2 ||
-                                          PanelLocation == Location.Custom);
+        public virtual bool IsVisible => Main.playerInventory;
 
         public override void OnInitialize() {
-            EquipSlot = new CustomItemSlot(ItemSlot.Context.EquipAccessory, 0.85f);
-            SocialSlot = new CustomItemSlot(ItemSlot.Context.EquipAccessoryVanity, 0.85f) {
-                Partner = EquipSlot
-            };
-            DyeSlot = new CustomItemSlot(ItemSlot.Context.EquipDye, 0.85f);
-
-            float slotSize = EquipSlot.Width.Pixels;
+            float slotSize = new CustomItemSlot().Width.Pixels;
 
             Panel = new DraggableUIPanel();
-            Panel.Width.Set((slotSize * 3) + (HorizontalSlotMargin * 2) + Panel.PaddingLeft + Panel.PaddingRight, 0);
-            Panel.Height.Set(slotSize + Panel.PaddingTop + Panel.PaddingBottom, 0);
-
-            SocialSlot.Left.Set(slotSize + HorizontalSlotMargin, 0);
-            EquipSlot.Left.Set((slotSize * 2) + (HorizontalSlotMargin * 2), 0);
-
-            Panel.Append(EquipSlot);
-            Panel.Append(SocialSlot);
-            Panel.Append(DyeSlot);
+            Panel.Width.Set((slotSize * 3) + (HorizontalSlotMargin * 2), 0);
+            Panel.Height.Set(slotSize + Panel.PaddingBottom + HorizontalSlotMargin, 0);
 
             Append(Panel);
         }
 
-        protected override void DrawSelf(SpriteBatch spriteBatch) {
-            if(PanelLocation == Location.Custom) {
-                PanelCoordinates = new Vector2(Panel.Left.Pixels, Panel.Top.Pixels);
-                MoveToCustomPosition();
-            }
-            else {
-                ResetPosition();
-            }
-        }
-
-        public virtual void MoveToCustomPosition() {
-            Panel.Left.Set(PanelCoordinates.X, 0);
-            Panel.Top.Set(PanelCoordinates.Y, 0);
-        }
-
-        protected virtual Vector2 CalculatePosition() {
-            int slotSize = (int)EquipSlot.Width.Pixels;
-            int mapH = 0;
-            int rX;
-            int rY;
-
-            // Most of this function is just copied from the game source.
-            if(Main.mapEnabled) {
-                if(!Main.mapFullscreen && Main.mapStyle == 1) {
-                    mapH = 256;
-                }
-            }
-
-            if(PanelLocation == Location.Uniques) {
-                if(Main.mapEnabled) {
-                    if((mapH + 600) > Main.screenHeight) {
-                        mapH = Main.screenHeight - 600;
-                    }
-                }
-
-                rX = Main.screenWidth - 92 - ((slotSize + HorizontalSlotMargin) * 3);
-                rY = mapH + 174;
-
-                if(Main.netMode == NetmodeID.MultiplayerClient) {
-                    rX -= slotSize + HorizontalSlotMargin;
-                }
-            }
-            else {
-                if(Main.mapEnabled) {
-                    int adjustY = 600;
-
-                    if(Main.player[Main.myPlayer].GetAmountOfExtraAccessorySlotsToShow() > 0) {
-                        adjustY = 610 + PlayerInput.UsingGamepad.ToInt() * 30;
-                    }
-
-                    if((mapH + adjustY) > Main.screenHeight) {
-                        mapH = Main.screenHeight - adjustY;
-                    }
-                }
-
-                rX = Main.screenWidth - 92 - 14 - ((slotSize + HorizontalSlotMargin) * 3)
-                     - (int)(TextureAssets.Extra[58].Value.Width * EquipSlot.Scale);
-                rY = mapH + 174;
-            }
-
-            // Skip the armor section.
-            if(PanelLocation == Location.Accessories && RowsToSkip >= 3)
-                rY += 4;
-            // Fix the minor offset issue that occurs on the uniques page.
-            else if(PanelLocation == Location.Uniques)
-                rY -= (RowsToSkip / 2);
-
-            // Skip the number of rows specified.
-            rY += (int)(Math.Max(RowsToSkip, 0) * 56 * EquipSlot.Scale);
-
-            return new Vector2(rX, rY);
-        }
-
         protected virtual Vector2 GetDefaultPosition() {
-            Vector2 pos = CalculatePosition();
-
-            return new Vector2(
-                pos.X - Panel.PaddingLeft - ((EquipSlot.Width.Pixels + HorizontalSlotMargin) * 2),
-                pos.Y - Panel.PaddingTop);
+            return new Vector2(Main.screenWidth / 2, Main.screenHeight / 2);
         }
 
         public virtual void ResetPosition() {
