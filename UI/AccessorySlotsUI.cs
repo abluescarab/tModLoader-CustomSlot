@@ -8,7 +8,7 @@ namespace CustomSlot.UI {
         /// The horizontal margin between slots.
         /// Default: 3 (from game source code)
         /// </summary>
-        protected int HorizontalSlotMargin = 3;
+        protected const int HorizontalSlotMargin = 3;
         /// <summary>
         /// The current panel coordinates.
         /// </summary>
