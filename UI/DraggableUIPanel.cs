@@ -13,6 +13,10 @@ namespace CustomSlot.UI {
         private bool dragging = false;
         private bool visible = true;
 
+        public event PanelDragEventHandler OnDragBegin;
+        public event PanelDragEventHandler OnDragEnd;
+        public event PanelDragEventHandler OnDrag;
+
         public bool CanDrag { get; set; } = true;
 
         public bool Visible {
@@ -61,6 +65,8 @@ namespace CustomSlot.UI {
             if(dragging) {
                 Left.Set(Main.mouseX - offset.X, 0);
                 Top.Set(Main.mouseY - offset.Y, 0);
+
+                OnDrag?.Invoke(this, new PanelDragEventArgs(Left, Top));
             }
 
             Rectangle parentDimensions = Parent.GetDimensions().ToRectangle();
@@ -74,6 +80,8 @@ namespace CustomSlot.UI {
         private void DragBegin(UIMouseEvent e) {
             offset = new Vector2(e.MousePosition.X - Left.Pixels, e.MousePosition.Y - Top.Pixels);
             dragging = true;
+
+            OnDragBegin?.Invoke(this, new PanelDragEventArgs(Left, Top));
         }
 
         private void DragEnd(UIMouseEvent e) {
@@ -82,6 +90,8 @@ namespace CustomSlot.UI {
 
             Left.Set(end.X - offset.X, 0);
             Top.Set(end.Y - offset.Y, 0);
+
+            OnDragEnd?.Invoke(this, new PanelDragEventArgs(Left, Top));
         }
     }
 }

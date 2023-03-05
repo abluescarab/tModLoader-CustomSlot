@@ -1,6 +1,6 @@
-﻿using System;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 using Terraria;
 using Terraria.Audio;
 using Terraria.GameContent;
@@ -18,7 +18,7 @@ namespace CustomSlot.UI {
             Chest,
             Leg
         }
-        
+
         public static class DefaultColors {
             public static readonly Color EmptyTexture = Color.White * 0.35f;
             public static readonly Color InventoryItemBack = Main.inventoryBack;
@@ -27,7 +27,7 @@ namespace CustomSlot.UI {
 
         internal const int TickOffsetX = 6;
         internal const int TickOffsetY = 2;
-        
+
         protected Item item;
         protected CroppedTexture2D backgroundTexture;
         protected float scale;
