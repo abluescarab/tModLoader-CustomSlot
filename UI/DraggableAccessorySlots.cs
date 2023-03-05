@@ -5,7 +5,13 @@ using Terraria.UI;
 namespace CustomSlot.UI {
     [Autoload(false)]
     public abstract class DraggableAccessorySlots : ModAccessorySlot {
+        /// <summary>
+        /// The UI to draw the slots on top of.
+        /// </summary>
         public abstract AccessorySlotsUI UI { get; }
+        /// <summary>
+        /// Whether to use the <see cref="CustomLocation"/> property.
+        /// </summary>
         public abstract bool UseCustomLocation { get; }
 
         public override Vector2? CustomLocation {
