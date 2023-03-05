@@ -33,6 +33,12 @@ namespace CustomSlot.UI {
         public Vector2 PanelCoordinates;
 
         /// <summary>
+        /// The default location of the panel.
+        /// </summary>
+        public Vector2 DefaultCoordinates {
+            get => GetDefaultPosition();
+        }
+        /// <summary>
         /// The slot holding the equipped item.
         /// </summary>
         public CustomItemSlot EquipSlot { get; protected set; }
@@ -73,11 +79,6 @@ namespace CustomSlot.UI {
             Panel.Width.Set((slotSize * 3) + (HorizontalSlotMargin * 2) + Panel.PaddingLeft + Panel.PaddingRight, 0);
             Panel.Height.Set(slotSize + Panel.PaddingTop + Panel.PaddingBottom, 0);
 
-            if(PanelLocation == Location.Custom)
-                MoveToCustomPosition();
-            else
-                ResetPosition();
-
             SocialSlot.Left.Set(slotSize + HorizontalSlotMargin, 0);
             EquipSlot.Left.Set((slotSize * 2) + (HorizontalSlotMargin * 2), 0);
 
@@ -91,10 +92,11 @@ namespace CustomSlot.UI {
         protected override void DrawSelf(SpriteBatch spriteBatch) {
             if(PanelLocation == Location.Custom) {
                 PanelCoordinates = new Vector2(Panel.Left.Pixels, Panel.Top.Pixels);
-                return;
+                MoveToCustomPosition();
             }
-
-            ResetPosition();
+            else {
+                ResetPosition();
+            }
         }
 
         public virtual void MoveToCustomPosition() {
@@ -160,11 +162,19 @@ namespace CustomSlot.UI {
             return new Vector2(rX, rY);
         }
 
-        public virtual void ResetPosition() {
+        protected virtual Vector2 GetDefaultPosition() {
             Vector2 pos = CalculatePosition();
 
-            Panel.Left.Set(pos.X - Panel.PaddingLeft - ((EquipSlot.Width.Pixels + HorizontalSlotMargin) * 2), 0);
-            Panel.Top.Set(pos.Y - Panel.PaddingTop, 0);
+            return new Vector2(
+                pos.X - Panel.PaddingLeft - ((EquipSlot.Width.Pixels + HorizontalSlotMargin) * 2),
+                pos.Y - Panel.PaddingTop);
+        }
+
+        public virtual void ResetPosition() {
+            Vector2 pos = GetDefaultPosition();
+
+            Panel.Left.Set(pos.X, 0);
+            Panel.Top.Set(pos.Y, 0);
         }
     }
 }
