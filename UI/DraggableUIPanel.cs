@@ -6,7 +6,9 @@ using Terraria.UI;
 
 namespace CustomSlot.UI {
     public class DraggableUIPanel : UIPanel {
-        private readonly Color defaultBackgroundColor = new Color(63, 82, 151) * 0.7f;
+        public const byte DefaultBackgroundAlpha = 178;
+
+        private readonly Color defaultBackgroundColor = new Color(44, 57, 105, DefaultBackgroundAlpha);
         private readonly Color defaultBorderColor = Color.Black;
 
         private Vector2 offset;
